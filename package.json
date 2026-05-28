@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "firebase": "^12.13.0",
+    "react-router-dom": "^7.15.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.0",
+    "tailwindcss": "^4.3.0"
+  }
+}

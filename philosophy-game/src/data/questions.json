@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "question": "Cơ sở hạ tầng là gì?",
+    "answers": {
+      "A": "Đời sống tinh thần",
+      "B": "Quan hệ sản xuất",
+      "C": "Kiến trúc thượng tầng",
+      "D": "Ý thức xã hội"
+    },
+    "correct": "B",
+    "difficulty": "easy"
+  },
+  {
+    "id": 2,
+    "question": "Theo triết học Mác - Lênin, nguồn gốc của ý thức là gì?",
+    "answers": {
+      "A": "Nguồn gốc tự nhiên và nguồn gốc xã hội",
+      "B": "Sự phát triển của bộ óc người",
+      "C": "Sự tác động của thế giới khách quan",
+      "D": "Lao động và ngôn ngữ"
+    },
+    "correct": "A",
+    "difficulty": "medium"
+  },
+  {
+    "id": 3,
+    "question": "Phạm trù nào dùng để chỉ những gì hiện có, hiện đang tồn tại thực sự?",
+    "answers": {
+      "A": "Khả năng",
+      "B": "Hiện thực",
+      "C": "Bản chất",
+      "D": "Hiện tượng"
+    },
+    "correct": "B",
+    "difficulty": "medium"
+  },
+  {
+    "id": 4,
+    "question": "Ai là người sáng lập ra triết học Mác?",
+    "answers": {
+      "A": "V.I. Lênin",
+      "B": "Ph. Ăngghen",
+      "C": "C. Mác và Ph. Ăngghen",
+      "D": "C. Mác"
+    },
+    "correct": "C",
+    "difficulty": "easy"
+  },
+  {
+    "id": 5,
+    "question": "Quan điểm nào cho rằng vật chất và ý thức là hai thực thể độc lập?",
+    "answers": {
+      "A": "Chủ nghĩa duy vật",
+      "B": "Chủ nghĩa duy tâm",
+      "C": "Nhị nguyên luận",
+      "D": "Thuyết không thể biết"
+    },
+    "correct": "C",
+    "difficulty": "hard"
+  }
+]

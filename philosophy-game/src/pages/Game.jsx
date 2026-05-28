@@ -1,0 +1,182 @@
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { ref, onValue } from 'firebase/database';
+import { database } from '../firebase/config';
+import { submitAnswer, nextQuestion } from '../services/gameService';
+import { useTimer } from '../hooks/useTimer';
+import QuestionCard from '../components/QuestionCard';
+import AnswerButton from '../components/AnswerButton';
+import Leaderboard from '../components/Leaderboard';
+
+const TIME_PER_QUESTION = 15;
+
+const Game = () => {
+  const { roomCode } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { playerId } = location.state || {};
+
+  const [gameState, setGameState] = useState(null);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [waitingForNext, setWaitingForNext] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+
+  const { seconds, start, reset, pause } = useTimer(TIME_PER_QUESTION, () => {
+    // Timer expired
+    if (!hasSubmitted) {
+      handleAnswerSubmit(null);
+    }
+  });
+
+  useEffect(() => {
+    if (!roomCode || !playerId) {
+      navigate('/');
+      return;
+    }
+
+    const roomRef = ref(database, `rooms/${roomCode}`);
+    const unsubscribe = onValue(roomRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        setGameState(data);
+        
+        if (data.gameState === 'finished') {
+          navigate(`/result/${roomCode}`);
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [roomCode, playerId, navigate]);
+
+  // Handle new question
+  useEffect(() => {
+    if (gameState?.questions && gameState.currentQuestionIndex !== undefined) {
+      const startTime = gameState.questionStartTime;
+      const now = Date.now();
+      
+      // Reset state for new question
+      setSelectedAnswer(null);
+      setHasSubmitted(false);
+      setWaitingForNext(false);
+      setShowLeaderboard(false);
+      
+      if (startTime > now) {
+        // Still in delay before question starts
+        const delay = startTime - now;
+        reset(TIME_PER_QUESTION);
+        setTimeout(() => {
+          start();
+        }, delay);
+      } else {
+        // Question already started, calculate remaining time
+        const elapsed = Math.floor((now - startTime) / 1000);
+        const remaining = Math.max(0, TIME_PER_QUESTION - elapsed);
+        reset(remaining);
+        start();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState?.currentQuestionIndex]);
+
+  const handleAnswerSubmit = async (answerKey) => {
+    if (hasSubmitted || waitingForNext) return;
+    
+    pause();
+    setSelectedAnswer(answerKey);
+    setHasSubmitted(true);
+    
+    const currentQuestion = gameState.questions[gameState.currentQuestionIndex];
+    let score = 0;
+    
+    if (answerKey === currentQuestion.correct) {
+      // Calculate score based on time remaining: max 1000, min 100
+      score = Math.floor((seconds / TIME_PER_QUESTION) * 900) + 100;
+    }
+    
+    await submitAnswer(roomCode, playerId, score);
+    
+    // Show leaderboard briefly before host moves to next question
+    setTimeout(() => {
+      setWaitingForNext(true);
+      setShowLeaderboard(true);
+      
+      // Host logic to move to next question after 5 seconds
+      if (gameState.players[playerId]?.isHost) {
+        setTimeout(() => {
+          nextQuestion(roomCode, gameState.currentQuestionIndex, gameState.questions.length);
+        }, 5000);
+      }
+    }, 2000);
+  };
+
+  if (!gameState || !gameState.questions) {
+    return <div className="flex-1 flex items-center justify-center text-white">Đang tải...</div>;
+  }
+
+  const currentQuestion = gameState.questions[gameState.currentQuestionIndex];
+  const isDelay = Date.now() < gameState.questionStartTime;
+
+  if (isDelay && !waitingForNext) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+        <h2 className="text-4xl font-bold text-white mb-4 animate-pulse">Chuẩn bị...</h2>
+        <div className="text-xl text-indigo-300">Câu hỏi {gameState.currentQuestionIndex + 1} chuẩn bị xuất hiện</div>
+      </div>
+    );
+  }
+
+  if (showLeaderboard) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-6">
+        <h2 className="text-2xl text-white mb-6">Đang chuẩn bị câu tiếp theo...</h2>
+        <Leaderboard players={gameState.players} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 flex flex-col p-4 md:p-8 w-full max-w-4xl mx-auto">
+      
+      <div className="flex items-center justify-between mb-8">
+        <div className="text-lg font-bold bg-slate-800 px-4 py-2 rounded-xl text-white">
+          Điểm: <span className="text-indigo-400">{gameState.players[playerId]?.score || 0}</span>
+        </div>
+        
+        <div className="relative w-16 h-16 flex items-center justify-center bg-slate-800 rounded-full border-4 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.5)]">
+          <span className={`text-2xl font-bold ${seconds <= 5 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+            {seconds}
+          </span>
+        </div>
+        
+        <div className="text-lg font-bold bg-slate-800 px-4 py-2 rounded-xl text-slate-300">
+          Câu {gameState.currentQuestionIndex + 1}/{gameState.questions.length}
+        </div>
+      </div>
+
+      <QuestionCard 
+        question={currentQuestion.question} 
+        index={gameState.currentQuestionIndex} 
+        total={gameState.questions.length} 
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        {Object.entries(currentQuestion.answers).map(([key, text]) => (
+          <AnswerButton 
+            key={key}
+            label={key}
+            text={text}
+            selected={selectedAnswer === key}
+            correct={hasSubmitted ? key === currentQuestion.correct : undefined}
+            disabled={hasSubmitted}
+            onClick={() => handleAnswerSubmit(key)}
+          />
+        ))}
+      </div>
+
+    </div>
+  );
+};
+
+export default Game;
