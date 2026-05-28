@@ -3,11 +3,15 @@ import { database } from "../firebase/config";
 
 export const startGame = async (roomCode, questionsList) => {
   try {
-    // Shuffle and pick 10 questions or how many are available
-    const shuffled = [...questionsList].sort(() => 0.5 - Math.random());
-    const selectedQuestions = shuffled.slice(0, 10);
-
     const roomRef = ref(database, `rooms/${roomCode}`);
+    const snapshot = await get(roomRef);
+    const roomData = snapshot.exists() ? snapshot.val() : {};
+    const numQuestions = roomData.numQuestions || 10;
+
+    // Shuffle and pick numQuestions or how many are available
+    const shuffled = [...questionsList].sort(() => 0.5 - Math.random());
+    const selectedQuestions = shuffled.slice(0, numQuestions);
+
     await update(roomRef, {
       gameState: "playing",
       questions: selectedQuestions,

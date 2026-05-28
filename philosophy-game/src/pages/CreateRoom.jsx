@@ -5,6 +5,8 @@ import { ArrowLeft } from 'lucide-react';
 
 const CreateRoom = () => {
   const [name, setName] = useState('');
+  const [numQuestions, setNumQuestions] = useState(10);
+  const [timePerQuestion, setTimePerQuestion] = useState(15);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -14,7 +16,7 @@ const CreateRoom = () => {
     
     setLoading(true);
     try {
-      const { roomCode, playerId } = await createRoom(name);
+      const { roomCode, playerId } = await createRoom(name, numQuestions, timePerQuestion);
       navigate(`/lobby/${roomCode}`, { state: { playerId, isHost: true } });
     } catch (error) {
       console.error(error);
@@ -49,6 +51,33 @@ const CreateRoom = () => {
               maxLength={20}
               required
             />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Số câu hỏi</label>
+              <input 
+                type="number" 
+                value={numQuestions}
+                onChange={(e) => setNumQuestions(Number(e.target.value))}
+                className="input-field"
+                min="5"
+                max="50"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Thời gian/Câu (s)</label>
+              <input 
+                type="number" 
+                value={timePerQuestion}
+                onChange={(e) => setTimePerQuestion(Number(e.target.value))}
+                className="input-field"
+                min="5"
+                max="60"
+                required
+              />
+            </div>
           </div>
           
           <button 

@@ -5,7 +5,7 @@ const generateRoomCode = () => {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 };
 
-export const createRoom = async (hostName) => {
+export const createRoom = async (hostName, numQuestions = 10, timePerQuestion = 15) => {
   try {
     const roomCode = generateRoomCode();
     const hostId = "host_" + Date.now();
@@ -15,6 +15,8 @@ export const createRoom = async (hostName) => {
       gameState: "waiting", // waiting, playing, finished
       currentQuestionIndex: 0,
       createdAt: Date.now(),
+      numQuestions,
+      timePerQuestion,
       players: {
         [hostId]: {
           name: hostName,

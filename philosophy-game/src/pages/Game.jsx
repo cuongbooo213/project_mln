@@ -8,8 +8,6 @@ import QuestionCard from '../components/QuestionCard';
 import AnswerButton from '../components/AnswerButton';
 import Leaderboard from '../components/Leaderboard';
 
-const TIME_PER_QUESTION = 15;
-
 const Game = () => {
   const { roomCode } = useParams();
   const location = useLocation();
@@ -21,8 +19,9 @@ const Game = () => {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [waitingForNext, setWaitingForNext] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const timePerQuestion = gameState?.timePerQuestion || 15;
 
-  const { seconds, start, reset, pause } = useTimer(TIME_PER_QUESTION, () => {
+  const { seconds, start, reset, pause } = useTimer(timePerQuestion, () => {
     // Timer expired
     if (!hasSubmitted) {
       handleAnswerSubmit(null);
@@ -65,14 +64,14 @@ const Game = () => {
       if (startTime > now) {
         // Still in delay before question starts
         const delay = startTime - now;
-        reset(TIME_PER_QUESTION);
+        reset(timePerQuestion);
         setTimeout(() => {
           start();
         }, delay);
       } else {
         // Question already started, calculate remaining time
         const elapsed = Math.floor((now - startTime) / 1000);
-        const remaining = Math.max(0, TIME_PER_QUESTION - elapsed);
+        const remaining = Math.max(0, timePerQuestion - elapsed);
         reset(remaining);
         start();
       }
@@ -92,7 +91,7 @@ const Game = () => {
     
     if (answerKey === currentQuestion.correct) {
       // Calculate score based on time remaining: max 1000, min 100
-      score = Math.floor((seconds / TIME_PER_QUESTION) * 900) + 100;
+      score = Math.floor((seconds / timePerQuestion) * 900) + 100;
     }
     
     await submitAnswer(roomCode, playerId, score);
