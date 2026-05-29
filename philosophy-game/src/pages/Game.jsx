@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ref, onValue } from 'firebase/database';
 import { database } from '../firebase/config';
+import { getServerTime } from '../firebase/timeSync';
 import { submitAnswer, nextQuestion } from '../services/gameService';
 import { useTimer } from '../hooks/useTimer';
 import QuestionCard from '../components/QuestionCard';
@@ -53,7 +54,7 @@ const Game = () => {
   useEffect(() => {
     if (gameState?.questions && gameState.currentQuestionIndex !== undefined) {
       const startTime = gameState.questionStartTime;
-      const now = Date.now();
+      const now = getServerTime();
       
       // Reset state for new question
       setSelectedAnswer(null);
@@ -115,7 +116,7 @@ const Game = () => {
   }
 
   const currentQuestion = gameState.questions[gameState.currentQuestionIndex];
-  const isDelay = Date.now() < gameState.questionStartTime;
+  const isDelay = getServerTime() < gameState.questionStartTime;
 
   if (isDelay && !waitingForNext) {
     return (

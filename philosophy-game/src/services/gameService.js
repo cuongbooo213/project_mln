@@ -1,5 +1,6 @@
 import { ref, update, get } from "firebase/database";
 import { database } from "../firebase/config";
+import { getServerTime } from "../firebase/timeSync";
 
 export const startGame = async (roomCode, questionsList) => {
   try {
@@ -16,7 +17,7 @@ export const startGame = async (roomCode, questionsList) => {
       gameState: "playing",
       questions: selectedQuestions,
       currentQuestionIndex: 0,
-      questionStartTime: Date.now() + 3000, // 3 seconds delay before first question
+      questionStartTime: getServerTime() + 3000, // 3 seconds delay before first question
     });
   } catch (error) {
     console.error("Error starting game:", error);
@@ -50,7 +51,7 @@ export const nextQuestion = async (roomCode, currentIndex, totalQuestions) => {
       // Next question
       await update(roomRef, {
         currentQuestionIndex: currentIndex + 1,
-        questionStartTime: Date.now() + 3000 // 3 seconds delay for players to read
+        questionStartTime: getServerTime() + 3000 // 3 seconds delay for players to read
       });
     }
   } catch (error) {

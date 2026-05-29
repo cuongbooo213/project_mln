@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play, Users, BookOpen } from 'lucide-react';
+import logo from '../assets/logo.jpg';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -8,8 +9,8 @@ const Home = () => {
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-6">
       <div className="max-w-2xl w-full flex flex-col items-center text-center">
-        <div className="bg-indigo-500/20 p-6 rounded-full mb-8">
-          <BookOpen size={64} className="text-indigo-400" />
+        <div className="mb-8">
+          <img src={logo} alt="Philosophy Arena Logo" className="w-48 h-48 md:w-56 md:h-56 object-cover rounded-full shadow-2xl ring-4 ring-indigo-500/30" />
         </div>
         
         <h1 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-4">
