@@ -298,5 +298,65 @@
     },
     "correct": "A",
     "difficulty": "medium"
+  },
+  {
+    "id": 26,
+    "question": "Quan điểm nào của triết học Mác - Lênin về nguồn gốc của ngôn ngữ?",
+    "answers": {
+      "A": "Do Thượng đế ban cho con người",
+      "B": "Là kết quả của sự thỏa thuận giữa con người với nhau",
+      "C": "Nảy sinh từ lao động và cùng với lao động",
+      "D": "Tự nhiên sinh ra cùng với con người"
+    },
+    "correct": "C",
+    "difficulty": "hard"
+  },
+  {
+    "id": 27,
+    "question": "Đâu là yếu tố nhạy bén và cách mạng nhất trong lực lượng sản xuất?",
+    "answers": {
+      "A": "Người lao động",
+      "B": "Công cụ lao động",
+      "C": "Đối tượng lao động",
+      "D": "Tư liệu sản xuất"
+    },
+    "correct": "B",
+    "difficulty": "hard"
+  },
+  {
+    "id": 28,
+    "question": "Quy luật nào vạch ra khuynh hướng của sự phát triển?",
+    "answers": {
+      "A": "Quy luật lượng - chất",
+      "B": "Quy luật mâu thuẫn",
+      "C": "Quy luật phủ định của phủ định",
+      "D": "Quy luật đấu tranh giai cấp"
+    },
+    "correct": "C",
+    "difficulty": "hard"
+  },
+  {
+    "id": 29,
+    "question": "Ý thức có tính chất gì đặc trưng nhất khác với vật chất?",
+    "answers": {
+      "A": "Tính thực tại khách quan",
+      "B": "Tính năng động, sáng tạo",
+      "C": "Tính bất biến",
+      "D": "Tính hữu hạn"
+    },
+    "correct": "B",
+    "difficulty": "hard"
+  },
+  {
+    "id": 30,
+    "question": "Cấu trúc của ý thức bao gồm những yếu tố cơ bản nào?",
+    "answers": {
+      "A": "Tri thức, tình cảm, niềm tin, ý chí",
+      "B": "Tri thức, tình cảm, ý chí",
+      "C": "Tự ý thức, tiềm thức, vô thức",
+      "D": "Lý trí, tình cảm, bản năng"
+    },
+    "correct": "A",
+    "difficulty": "hard"
   }
 ]

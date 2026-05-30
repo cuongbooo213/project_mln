@@ -8,6 +8,7 @@ import { useTimer } from '../hooks/useTimer';
 import QuestionCard from '../components/QuestionCard';
 import AnswerButton from '../components/AnswerButton';
 import Leaderboard from '../components/Leaderboard';
+import logo from '../assets/logo21.png';
 
 const Game = () => {
   const { roomCode } = useParams();
@@ -121,7 +122,8 @@ const Game = () => {
   if (isDelay && !waitingForNext) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-        <h2 className="text-4xl font-bold text-white mb-4 animate-pulse">Chuẩn bị...</h2>
+        <img src={logo} alt="Logo" className="w-32 h-32 mb-6 object-cover rounded-full shadow-[0_0_20px_rgba(99,102,241,0.5)] ring-4 ring-indigo-500/50 bg-white animate-pulse" />
+        <h2 className="text-4xl font-bold text-white mb-4">Chuẩn bị...</h2>
         <div className="text-xl text-indigo-300">Câu hỏi {gameState.currentQuestionIndex + 1} chuẩn bị xuất hiện</div>
       </div>
     );
@@ -130,6 +132,7 @@ const Game = () => {
   if (showLeaderboard) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-6">
+        <img src={logo} alt="Logo" className="w-24 h-24 mb-4 object-cover rounded-full shadow-lg ring-2 ring-indigo-500/30 bg-white" />
         <h2 className="text-2xl text-white mb-6">Đang chuẩn bị câu tiếp theo...</h2>
         <Leaderboard players={gameState.players} />
       </div>
@@ -137,9 +140,14 @@ const Game = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col p-4 md:p-8 w-full max-w-4xl mx-auto">
+    <div className="flex-1 flex flex-col p-4 md:p-8 w-full max-w-4xl mx-auto relative">
       
-      <div className="flex items-center justify-between mb-8">
+      {/* Background Watermark Logo */}
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0 opacity-15">
+        <img src={logo} alt="Watermark" className="w-[600px] h-[600px] md:w-[1200px] md:h-[1200px] max-w-none object-cover rounded-full" />
+      </div>
+
+      <div className="flex items-center justify-between mb-8 relative z-10">
         <div className="text-lg font-bold bg-slate-800 px-4 py-2 rounded-xl text-white">
           Điểm: <span className="text-indigo-400">{gameState.players[playerId]?.score || 0}</span>
         </div>

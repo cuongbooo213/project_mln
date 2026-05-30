@@ -6,6 +6,7 @@ import JoinRoom from './pages/JoinRoom';
 import Lobby from './pages/Lobby';
 import Game from './pages/Game';
 import Result from './pages/Result';
+import MillionaireGame from './pages/MillionaireGame';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/lobby/:roomCode" element={<Lobby />} />
           <Route path="/game/:roomCode" element={<Game />} />
           <Route path="/result/:roomCode" element={<Result />} />
+          <Route path="/millionaire" element={<MillionaireGame />} />
         </Routes>
       </main>
     </div>

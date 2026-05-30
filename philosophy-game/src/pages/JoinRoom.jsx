@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { joinRoom } from '../services/roomService';
 import { ArrowLeft } from 'lucide-react';
+import logo from '../assets/logo21.png';
 
 const JoinRoom = () => {
   const [code, setCode] = useState('');
@@ -28,15 +29,19 @@ const JoinRoom = () => {
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center p-6">
-      <div className="panel w-full max-w-md">
-        <button 
-          onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors"
-        >
-          <ArrowLeft size={20} />
-          <span>Quay lại</span>
-        </button>
+    <div className="flex-1 flex flex-col items-center justify-center p-6 relative w-full">
+      <button 
+        onClick={() => navigate('/')}
+        className="absolute top-4 left-4 md:top-8 md:left-8 flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+      >
+        <ArrowLeft size={20} />
+        <span className="hidden md:inline">Quay lại</span>
+      </button>
+
+      <div className="panel w-full max-w-md relative pt-20 md:pt-24 mt-16 md:mt-20">
+        <div className="absolute -top-16 md:-top-20 left-1/2 -translate-x-1/2">
+          <img src={logo} alt="Philosophy Arena" className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full shadow-[0_0_20px_rgba(99,102,241,0.4)] ring-[6px] ring-slate-800 bg-white" />
+        </div>
 
         <h2 className="text-3xl font-bold mb-6 text-center text-white">Tham Gia Phòng</h2>
         
