@@ -4,6 +4,7 @@ import { ref, get } from 'firebase/database';
 import { database } from '../firebase/config';
 import Leaderboard from '../components/Leaderboard';
 import { Home } from 'lucide-react';
+import logo from '../assets/logo21.png';
 
 const Result = () => {
   const { roomCode } = useParams();
@@ -28,7 +29,7 @@ const Result = () => {
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-2xl text-center flex flex-col items-center">
-        
+        <img src={logo} alt="Philosophy Arena" className="w-24 h-24 mb-6 object-cover rounded-full shadow-[0_0_20px_rgba(99,102,241,0.3)] ring-2 ring-indigo-500/30 bg-white" />
         <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-600 mb-2">
           Kết Quả Chung Cuộc
         </h1>

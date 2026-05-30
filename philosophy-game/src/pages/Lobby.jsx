@@ -6,6 +6,7 @@ import { startGame } from '../services/gameService';
 import RoomCode from '../components/RoomCode';
 import questionsData from '../data/questions.json';
 import { Users, Play } from 'lucide-react';
+import logo from '../assets/logo21.png';
 
 const Lobby = () => {
   const { roomCode } = useParams();
@@ -47,9 +48,12 @@ const Lobby = () => {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-6">
-      <div className="w-full max-w-2xl flex flex-col gap-8">
+      <div className="w-full max-w-2xl flex flex-col gap-8 mt-12">
         
-        <div className="panel flex flex-col items-center text-center">
+        <div className="panel flex flex-col items-center text-center relative pt-20 md:pt-24 mt-16 md:mt-20">
+          <div className="absolute -top-16 md:-top-20 left-1/2 -translate-x-1/2">
+            <img src={logo} alt="Philosophy Arena" className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full shadow-[0_0_20px_rgba(99,102,241,0.4)] ring-[6px] ring-slate-800 bg-white" />
+          </div>
           <h2 className="text-3xl font-bold mb-8 text-white">Phòng Chờ</h2>
           <RoomCode code={roomCode} />
         </div>
