@@ -9,6 +9,7 @@ import QuestionCard from '../components/QuestionCard';
 import AnswerButton from '../components/AnswerButton';
 import Leaderboard from '../components/Leaderboard';
 import logo from '../assets/logo21.png';
+import bgMusicFile from '../../sound_effect/backgroundmusicbeginning/nhac_nen_to_chuc_tro_choi-www_tiengdong_com (1).mp3';
 
 const Game = () => {
   const { roomCode } = useParams();
@@ -21,6 +22,7 @@ const Game = () => {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [waitingForNext, setWaitingForNext] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showResult, setShowResult] = useState(false);
   const timePerQuestion = gameState?.timePerQuestion || 15;
 
   const { seconds, start, reset, pause } = useTimer(timePerQuestion, () => {
@@ -29,6 +31,17 @@ const Game = () => {
       handleAnswerSubmit(null);
     }
   });
+
+  useEffect(() => {
+    const audio = new Audio(bgMusicFile);
+    audio.loop = true;
+    audio.volume = 0.2;
+    audio.play().catch(e => console.log("Audio prevented:", e));
+
+    return () => {
+      audio.pause();
+    };
+  }, []);
 
   useEffect(() => {
     if (!roomCode || !playerId) {
@@ -62,6 +75,7 @@ const Game = () => {
       setHasSubmitted(false);
       setWaitingForNext(false);
       setShowLeaderboard(false);
+      setShowResult(false);
       
       if (startTime > now) {
         // Still in delay before question starts
@@ -81,10 +95,35 @@ const Game = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState?.currentQuestionIndex]);
 
+  const isDelay = gameState ? getServerTime() < gameState.questionStartTime : false;
+  const numPlayers = Object.keys(gameState?.players || {}).length;
+  const numAnswers = Object.keys(gameState?.questionAnswers?.[gameState?.currentQuestionIndex] || {}).length;
+  const allAnswered = numPlayers > 0 && numAnswers >= numPlayers;
+  const timeExpired = seconds === 0 && !isDelay && gameState;
+  const shouldReveal = allAnswered || timeExpired;
+
+  useEffect(() => {
+    if (shouldReveal && !showResult && !waitingForNext && !isDelay) {
+      setShowResult(true);
+      
+      setTimeout(() => {
+        setShowLeaderboard(true);
+        setWaitingForNext(true);
+        
+        if (gameState.players[playerId]?.isHost) {
+          setTimeout(() => {
+            nextQuestion(roomCode, gameState.currentQuestionIndex, gameState.questions.length);
+          }, 5000);
+        }
+      }, 3000);
+    }
+  }, [shouldReveal, showResult, waitingForNext, isDelay, gameState, playerId, roomCode]);
+
   const handleAnswerSubmit = async (answerKey) => {
-    if (hasSubmitted || waitingForNext) return;
+    if (hasSubmitted || waitingForNext || showResult) return;
     
-    pause();
+    const submitTime = getServerTime();
+    
     setSelectedAnswer(answerKey);
     setHasSubmitted(true);
     
@@ -92,24 +131,19 @@ const Game = () => {
     let score = 0;
     
     if (answerKey === currentQuestion.correct) {
-      // Calculate score based on time remaining: max 1000, min 100
-      score = Math.floor((seconds / timePerQuestion) * 900) + 100;
+      const startTime = gameState.questionStartTime;
+      const timeTakenMs = Math.max(0, submitTime - startTime);
+      const totalTimeMs = timePerQuestion * 1000;
+      
+      if (timeTakenMs <= 1000) {
+        score = 1000;
+      } else {
+        const ratio = Math.max(0, (totalTimeMs - timeTakenMs) / totalTimeMs);
+        score = Math.floor(ratio * 900) + 100;
+      }
     }
     
-    await submitAnswer(roomCode, playerId, score);
-    
-    // Show leaderboard briefly before host moves to next question
-    setTimeout(() => {
-      setWaitingForNext(true);
-      setShowLeaderboard(true);
-      
-      // Host logic to move to next question after 5 seconds
-      if (gameState.players[playerId]?.isHost) {
-        setTimeout(() => {
-          nextQuestion(roomCode, gameState.currentQuestionIndex, gameState.questions.length);
-        }, 5000);
-      }
-    }, 2000);
+    await submitAnswer(roomCode, playerId, score, gameState.currentQuestionIndex);
   };
 
   if (!gameState || !gameState.questions) {
@@ -117,7 +151,6 @@ const Game = () => {
   }
 
   const currentQuestion = gameState.questions[gameState.currentQuestionIndex];
-  const isDelay = getServerTime() < gameState.questionStartTime;
 
   if (isDelay && !waitingForNext) {
     return (
@@ -176,8 +209,8 @@ const Game = () => {
             label={key}
             text={text}
             selected={selectedAnswer === key}
-            correct={hasSubmitted ? key === currentQuestion.correct : undefined}
-            disabled={hasSubmitted}
+            correct={showResult ? key === currentQuestion.correct : undefined}
+            disabled={hasSubmitted || showResult}
             onClick={() => handleAnswerSubmit(key)}
           />
         ))}

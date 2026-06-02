@@ -24,7 +24,7 @@ export const startGame = async (roomCode, questionsList) => {
   }
 };
 
-export const submitAnswer = async (roomCode, playerId, scoreToAdd) => {
+export const submitAnswer = async (roomCode, playerId, scoreToAdd, questionIndex) => {
   try {
     const playerRef = ref(database, `rooms/${roomCode}/players/${playerId}`);
     const snapshot = await get(playerRef);
@@ -32,6 +32,13 @@ export const submitAnswer = async (roomCode, playerId, scoreToAdd) => {
       const currentScore = snapshot.val().score || 0;
       await update(playerRef, {
         score: currentScore + scoreToAdd
+      });
+    }
+    
+    if (questionIndex !== undefined) {
+      const answeredRef = ref(database, `rooms/${roomCode}/questionAnswers/${questionIndex}`);
+      await update(answeredRef, {
+        [playerId]: true
       });
     }
   } catch (error) {
