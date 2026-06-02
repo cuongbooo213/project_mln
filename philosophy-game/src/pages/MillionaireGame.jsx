@@ -80,6 +80,9 @@ const MillionaireGame = () => {
 
   const handleTimeOut = () => {
     setGameState('wrong');
+    setTimeout(() => {
+      setGameState('game_over');
+    }, 3000);
   };
 
   const getSafePrize = () => {
@@ -112,6 +115,9 @@ const MillionaireGame = () => {
         }, 2000);
       } else {
         setGameState('wrong');
+        setTimeout(() => {
+          setGameState('game_over');
+        }, 3000);
       }
     }, 2000);
   };
@@ -257,7 +263,7 @@ const MillionaireGame = () => {
 
   if (!questions.length) return <div className="p-8 text-white">Đang tải câu hỏi...</div>;
   if (gameState === 'intro') return renderIntro();
-  if (['wrong', 'walk_away', 'won'].includes(gameState)) return renderGameOver();
+  if (['game_over', 'walk_away', 'won'].includes(gameState)) return renderGameOver();
 
   const currentQ = questions[currentStep];
   const isGrace = gameState === 'grace';
