@@ -5,8 +5,9 @@ import { database } from '../firebase/config';
 import { startGame } from '../services/gameService';
 import RoomCode from '../components/RoomCode';
 import questionsData from '../data/questions.json';
-import { Users, Play } from 'lucide-react';
+import { Users, Play, Info } from 'lucide-react';
 import logo from '../assets/logo21.png';
+import bgMusicFile from "../../sound_effect/backgroundmusicbeginning/Nh¡c chuông Nhac gameshow 'Dau truong 100.mp3";
 
 const Lobby = () => {
   const { roomCode } = useParams();
@@ -16,6 +17,17 @@ const Lobby = () => {
   const [isStarting, setIsStarting] = useState(false);
   
   const { playerId, isHost } = location.state || {};
+
+  useEffect(() => {
+    const audio = new Audio(bgMusicFile);
+    audio.loop = true;
+    audio.volume = 0.4;
+    audio.play().catch(e => console.log("Audio prevented:", e));
+
+    return () => {
+      audio.pause();
+    };
+  }, []);
 
   useEffect(() => {
     if (!roomCode || !playerId) {
@@ -97,6 +109,19 @@ const Lobby = () => {
               Đang chờ host bắt đầu game...
             </div>
           )}
+        </div>
+        
+        {/* Luật chơi & Cách tính điểm */}
+        <div className="panel">
+          <div className="flex items-center gap-3 mb-4">
+            <Info className="text-amber-400" />
+            <h3 className="text-xl font-bold text-white m-0">Luật Chơi & Tính Điểm</h3>
+          </div>
+          <div className="text-slate-300 space-y-3 bg-slate-900/50 p-4 md:p-6 rounded-xl border border-slate-700/50 leading-relaxed text-sm md:text-base">
+            <p>🎯 <strong className="text-indigo-400 font-semibold">Nhanh tay lẹ mắt:</strong> Điểm số được tính chính xác tới từng mili-giây. Trả lời càng nhanh, điểm càng cao (Tối đa 1000 điểm/câu).</p>
+            <p>⚡ <strong className="text-yellow-400 font-semibold">Phản xạ thần tốc (Grace Period):</strong> Nếu bạn trả lời đúng trong vòng <strong>1 giây đầu tiên</strong>, bạn sẽ luôn ẵm trọn 1000 điểm tuyệt đối.</p>
+            <p>⏳ <strong className="text-red-400 font-semibold">Thời gian trôi qua:</strong> Sau 1 giây, điểm tối đa sẽ bắt đầu giảm dần. Cố gắng đừng để hết giờ nhé!</p>
+          </div>
         </div>
         
       </div>

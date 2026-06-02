@@ -5,6 +5,8 @@ import { database } from '../firebase/config';
 import Leaderboard from '../components/Leaderboard';
 import { Home } from 'lucide-react';
 import logo from '../assets/logo21.png';
+import confetti from 'canvas-confetti';
+import bgMusicFile from '../../sound_effect/backgroundmusicbeginning/we_are_the_champions.mp3';
 
 const Result = () => {
   const { roomCode } = useParams();
@@ -20,6 +22,60 @@ const Result = () => {
       }
     };
     fetchResult();
+
+    // Play music
+    const audio = new Audio(bgMusicFile);
+    audio.loop = true;
+    audio.volume = 0.5;
+    audio.play().catch(e => console.log("Audio prevented:", e));
+
+    // Fireworks effect
+    const duration = 15 * 1000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 45, spread: 360, ticks: 60, zIndex: 100 };
+
+    const randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+    const interval = setInterval(function() {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 100 * (timeLeft / duration);
+      
+      // Random burst in the air
+      confetti({
+        ...defaults,
+        particleCount: Math.floor(randomInRange(30, 80)),
+        startVelocity: randomInRange(20, 40),
+        origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 }
+      });
+
+      // Shoot from left
+      confetti({
+        ...defaults,
+        particleCount,
+        angle: randomInRange(55, 75),
+        spread: randomInRange(50, 70),
+        origin: { x: 0, y: 1 }
+      });
+      
+      // Shoot from right
+      confetti({
+        ...defaults,
+        particleCount,
+        angle: randomInRange(105, 125),
+        spread: randomInRange(50, 70),
+        origin: { x: 1, y: 1 }
+      });
+    }, 200);
+
+    return () => {
+      audio.pause();
+      clearInterval(interval);
+    };
   }, [roomCode]);
 
   // Find winner

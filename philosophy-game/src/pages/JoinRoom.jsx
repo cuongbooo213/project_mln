@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { joinRoom } from '../services/roomService';
 import { ArrowLeft } from 'lucide-react';
 import logo from '../assets/logo21.png';
+import bgMusicFile from "../../sound_effect/backgroundmusicbeginning/Nh¡c chuông Nhac gameshow 'Dau truong 100.mp3";
 
 const JoinRoom = () => {
   const [code, setCode] = useState('');
@@ -10,6 +11,17 @@ const JoinRoom = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const audio = new Audio(bgMusicFile);
+    audio.loop = true;
+    audio.volume = 0.4;
+    audio.play().catch(e => console.log("Audio prevented:", e));
+
+    return () => {
+      audio.pause();
+    };
+  }, []);
 
   const handleJoin = async (e) => {
     e.preventDefault();

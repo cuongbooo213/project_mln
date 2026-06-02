@@ -3,6 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Phone, Users, HelpCircle, Check, X, Trophy } from 'lucide-react';
 import allQuestions from '../data/questions.json';
 import logoSingle from '../assets/logo.jpg';
+import bgMusicFile from '../../sound_effect/backgroundmusicbeginning/bgmusic.mp3';
+import playingMusicFile from '../../sound_effect/correct_effect/playing.mp3';
+import correctSound1 from '../../sound_effect/correct_effect/Am_thanh_Dung_nay_tat_ca_deu_dung_hop_ly_8211_Do_mixi-www_tiengdong_com.mp3';
+import correctSound2 from '../../sound_effect/correct_effect/Day_no_phai_the_chu_li_thang_nay_kha_va_gioi_ban_goc-www_tiengdong_com.mp3';
+import correctSound3 from '../../sound_effect/correct_effect/qua_chuan_luon_8211_pewpew-www_tiengdong_com.mp3';
+import incorrectSound1 from '../../sound_effect/incorrect_effect/Am_thanh_tra_loi_sai_ai_la_trieu_phu-www_tiengdong_com.mp3';
+import incorrectSound2 from '../../sound_effect/incorrect_effect/meme_that_vo_nghia_tiktok_mp3-www_tiengdong_com.mp3';
+import incorrectSound3 from '../../sound_effect/incorrect_effect/quen_cha_na_sound_effect-www_tiengdong_com.mp3';
+import callFriendSoundFile from '../../sound_effect/support/sssstiktok (mp3cut.net) (2).mp3';
+
+const CORRECT_SOUNDS = [correctSound1, correctSound2, correctSound3];
+const INCORRECT_SOUNDS = [incorrectSound1, incorrectSound2, incorrectSound3];
 
 const PRIZES = [
   "1.000.000", "2.000.000", "3.000.000", "4.000.000", "5.000.000",
@@ -49,6 +61,62 @@ const MillionaireGame = () => {
 
   const timerRef = useRef(null);
   const graceTimerRef = useRef(null);
+  const bgMusicRef = useRef(null);
+  const playingMusicRef = useRef(null);
+  const callFriendAudioRef = useRef(null);
+
+  useEffect(() => {
+    // Setup background music
+    bgMusicRef.current = new Audio(bgMusicFile);
+    bgMusicRef.current.loop = true;
+    bgMusicRef.current.volume = 0.4;
+
+    // Setup playing music
+    playingMusicRef.current = new Audio(playingMusicFile);
+    playingMusicRef.current.loop = true;
+    playingMusicRef.current.volume = 0.4;
+    
+    return () => {
+      if (bgMusicRef.current) {
+        bgMusicRef.current.pause();
+        bgMusicRef.current.currentTime = 0;
+      }
+      if (playingMusicRef.current) {
+        playingMusicRef.current.pause();
+        playingMusicRef.current.currentTime = 0;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!bgMusicRef.current || !playingMusicRef.current) return;
+    
+    if (['intro', 'game_over', 'won', 'walk_away'].includes(gameState)) {
+      playingMusicRef.current.pause();
+      playingMusicRef.current.currentTime = 0;
+
+      const playPromise = bgMusicRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log("Autoplay was prevented:", error);
+        });
+      }
+    } else if (['playing', 'grace', 'answering'].includes(gameState)) {
+      bgMusicRef.current.pause();
+      bgMusicRef.current.currentTime = 0; // Reset intro music to start
+
+      const playPromise = playingMusicRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log("Autoplay was prevented:", error);
+        });
+      }
+    } else {
+      // Pause all music for other states (correct, wrong)
+      bgMusicRef.current.pause();
+      playingMusicRef.current.pause();
+    }
+  }, [gameState]);
 
   useEffect(() => {
     setQuestions(getGameQuestions());
@@ -80,9 +148,33 @@ const MillionaireGame = () => {
 
   const handleTimeOut = () => {
     setGameState('wrong');
-    setTimeout(() => {
-      setGameState('game_over');
-    }, 3000);
+    
+    const randomSound = INCORRECT_SOUNDS[Math.floor(Math.random() * INCORRECT_SOUNDS.length)];
+    const audio = new Audio(randomSound);
+    audio.volume = 0.8;
+    
+    let isGameOverTriggered = false;
+    const triggerGameOver = () => {
+      if (!isGameOverTriggered) {
+        isGameOverTriggered = true;
+        audio.pause();
+        setGameState('game_over');
+      }
+    };
+    
+    if (randomSound === incorrectSound3) {
+      audio.ontimeupdate = () => {
+        if (audio.currentTime >= 9) {
+          triggerGameOver();
+        }
+      };
+    }
+    
+    audio.onended = triggerGameOver;
+    audio.play().catch(e => {
+      console.log("Audio prevented:", e);
+      setTimeout(triggerGameOver, 3000);
+    });
   };
 
   const getSafePrize = () => {
@@ -101,7 +193,12 @@ const MillionaireGame = () => {
       const currentQ = questions[currentStep];
       if (answerKey === currentQ.correct) {
         setGameState('correct');
-        setTimeout(() => {
+        
+        const randomSound = CORRECT_SOUNDS[Math.floor(Math.random() * CORRECT_SOUNDS.length)];
+        const audio = new Audio(randomSound);
+        audio.volume = 0.8;
+        
+        const nextStep = () => {
           if (currentStep === 14) {
             setGameState('won');
           } else {
@@ -112,12 +209,42 @@ const MillionaireGame = () => {
             setRemovedAnswers([]);
             setAudienceVote(null);
           }
-        }, 2000);
+        };
+
+        audio.onended = nextStep;
+        audio.play().catch(e => {
+          console.log("Audio prevented:", e);
+          setTimeout(nextStep, 2000);
+        });
       } else {
         setGameState('wrong');
-        setTimeout(() => {
-          setGameState('game_over');
-        }, 3000);
+        
+        const randomSound = INCORRECT_SOUNDS[Math.floor(Math.random() * INCORRECT_SOUNDS.length)];
+        const audio = new Audio(randomSound);
+        audio.volume = 0.8;
+        
+        let isGameOverTriggered = false;
+        const triggerGameOver = () => {
+          if (!isGameOverTriggered) {
+            isGameOverTriggered = true;
+            audio.pause();
+            setGameState('game_over');
+          }
+        };
+        
+        if (randomSound === incorrectSound3) {
+          audio.ontimeupdate = () => {
+            if (audio.currentTime >= 9) {
+              triggerGameOver();
+            }
+          };
+        }
+        
+        audio.onended = triggerGameOver;
+        audio.play().catch(e => {
+          console.log("Audio prevented:", e);
+          setTimeout(triggerGameOver, 3000);
+        });
       }
     }, 2000);
   };
@@ -173,6 +300,10 @@ const MillionaireGame = () => {
     setTimer(t => t + 30);
     setShowCallFriendModal(true);
     setLifelines(prev => ({ ...prev, callFriend: false }));
+
+    callFriendAudioRef.current = new Audio(callFriendSoundFile);
+    callFriendAudioRef.current.volume = 0.8;
+    callFriendAudioRef.current.play().catch(e => console.log("Call friend audio prevented:", e));
   };
 
   const renderIntro = () => (
@@ -425,11 +556,16 @@ const MillionaireGame = () => {
             <Phone size={48} className="mx-auto text-indigo-400 mb-4 animate-bounce" />
             <h3 className="text-2xl font-bold mb-4">Gọi Người Thân</h3>
             <p className="text-slate-300 mb-6">
-              Bạn có thêm <strong className="text-emerald-400">30 giây</strong> để suy nghĩ!<br/>
-              Gợi ý: "Tôi không chắc lắm, nhưng tôi linh cảm đáp án là <strong className="text-yellow-400">{questions[currentStep].correct}</strong>."
+              Bạn có thêm <strong className="text-emerald-400">30 giây</strong> để hỏi khán giả ở dưới!
             </p>
             <button 
-              onClick={() => setShowCallFriendModal(false)}
+              onClick={() => {
+                setShowCallFriendModal(false);
+                if (callFriendAudioRef.current) {
+                  callFriendAudioRef.current.pause();
+                  callFriendAudioRef.current.currentTime = 0;
+                }
+              }}
               className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg font-bold w-full"
             >
               Cảm ơn
