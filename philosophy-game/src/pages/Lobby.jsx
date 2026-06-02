@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ref, onValue } from 'firebase/database';
 import { database } from '../firebase/config';
 import { startGame } from '../services/gameService';
 import RoomCode from '../components/RoomCode';
+import { useAudioContext } from '../contexts/AudioContext';
 import questionsData from '../data/questions.json';
 import { Users, Play, Info } from 'lucide-react';
 import logo from '../assets/logo21.png';
@@ -18,16 +19,26 @@ const Lobby = () => {
   
   const { playerId, isHost } = location.state || {};
 
+  const { isMuted } = useAudioContext();
+  const audioRef = useRef(null);
+
   useEffect(() => {
-    const audio = new Audio(bgMusicFile);
-    audio.loop = true;
-    audio.volume = 0.4;
-    audio.play().catch(e => console.log("Audio prevented:", e));
+    audioRef.current = new Audio(bgMusicFile);
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.4;
+    audioRef.current.muted = isMuted;
+    audioRef.current.play().catch(e => console.log("Audio prevented:", e));
 
     return () => {
-      audio.pause();
+      if (audioRef.current) audioRef.current.pause();
     };
   }, []);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
 
   useEffect(() => {
     if (!roomCode || !playerId) {

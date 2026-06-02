@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createRoom } from '../services/roomService';
+import { useAudioContext } from '../contexts/AudioContext';
 import { ArrowLeft } from 'lucide-react';
 import logo from '../assets/logo21.png';
 import bgMusicFile from "../../sound_effect/backgroundmusicbeginning/Nh¡c chuông Nhac gameshow 'Dau truong 100.mp3";
@@ -12,16 +13,26 @@ const CreateRoom = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const { isMuted } = useAudioContext();
+  const audioRef = useRef(null);
+
   useEffect(() => {
-    const audio = new Audio(bgMusicFile);
-    audio.loop = true;
-    audio.volume = 0.4;
-    audio.play().catch(e => console.log("Audio prevented:", e));
+    audioRef.current = new Audio(bgMusicFile);
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.4;
+    audioRef.current.muted = isMuted;
+    audioRef.current.play().catch(e => console.log("Audio prevented:", e));
 
     return () => {
-      audio.pause();
+      if (audioRef.current) audioRef.current.pause();
     };
   }, []);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
 
   const handleCreate = async (e) => {
     e.preventDefault();

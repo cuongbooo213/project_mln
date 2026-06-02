@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ref, onValue } from 'firebase/database';
 import { database } from '../firebase/config';
@@ -8,6 +8,7 @@ import { useTimer } from '../hooks/useTimer';
 import QuestionCard from '../components/QuestionCard';
 import AnswerButton from '../components/AnswerButton';
 import Leaderboard from '../components/Leaderboard';
+import { useAudioContext } from '../contexts/AudioContext';
 import logo from '../assets/logo21.png';
 import bgMusicFile from '../../sound_effect/backgroundmusicbeginning/nhac_nen_to_chuc_tro_choi-www_tiengdong_com (1).mp3';
 
@@ -32,16 +33,26 @@ const Game = () => {
     }
   });
 
+  const { isMuted } = useAudioContext();
+  const audioRef = useRef(null);
+
   useEffect(() => {
-    const audio = new Audio(bgMusicFile);
-    audio.loop = true;
-    audio.volume = 0.2;
-    audio.play().catch(e => console.log("Audio prevented:", e));
+    audioRef.current = new Audio(bgMusicFile);
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.2;
+    audioRef.current.muted = isMuted;
+    audioRef.current.play().catch(e => console.log("Audio prevented:", e));
 
     return () => {
-      audio.pause();
+      if (audioRef.current) audioRef.current.pause();
     };
   }, []);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
 
   useEffect(() => {
     if (!roomCode || !playerId) {

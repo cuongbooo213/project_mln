@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ref, get } from 'firebase/database';
 import { database } from '../firebase/config';
 import Leaderboard from '../components/Leaderboard';
+import { useAudioContext } from '../contexts/AudioContext';
 import { Home } from 'lucide-react';
 import logo from '../assets/logo21.png';
 import confetti from 'canvas-confetti';
@@ -12,6 +13,8 @@ const Result = () => {
   const { roomCode } = useParams();
   const navigate = useNavigate();
   const [players, setPlayers] = useState({});
+  const { isMuted } = useAudioContext();
+  const audioRef = useRef(null);
 
   useEffect(() => {
     const fetchResult = async () => {
@@ -24,10 +27,11 @@ const Result = () => {
     fetchResult();
 
     // Play music
-    const audio = new Audio(bgMusicFile);
-    audio.loop = true;
-    audio.volume = 0.5;
-    audio.play().catch(e => console.log("Audio prevented:", e));
+    audioRef.current = new Audio(bgMusicFile);
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.5;
+    audioRef.current.muted = isMuted;
+    audioRef.current.play().catch(e => console.log("Audio prevented:", e));
 
     // Fireworks effect
     const duration = 15 * 1000;
@@ -73,10 +77,16 @@ const Result = () => {
     }, 200);
 
     return () => {
-      audio.pause();
+      if (audioRef.current) audioRef.current.pause();
       clearInterval(interval);
     };
   }, [roomCode]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
 
   // Find winner
   const sortedPlayers = Object.values(players).sort((a, b) => b.score - a.score);

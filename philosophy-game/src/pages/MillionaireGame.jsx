@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Phone, Users, HelpCircle, Check, X, Trophy } from 'lucide-react';
+import { useAudioContext } from '../contexts/AudioContext';
 import allQuestions from '../data/questions.json';
 import logoSingle from '../assets/logo.jpg';
 import bgMusicFile from '../../sound_effect/backgroundmusicbeginning/bgmusic.mp3';
@@ -58,6 +59,7 @@ const MillionaireGame = () => {
   const [removedAnswers, setRemovedAnswers] = useState([]);
   const [audienceVote, setAudienceVote] = useState(null);
   const [showCallFriendModal, setShowCallFriendModal] = useState(false);
+  const { isMuted } = useAudioContext();
 
   const timerRef = useRef(null);
   const graceTimerRef = useRef(null);
@@ -87,6 +89,12 @@ const MillionaireGame = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (bgMusicRef.current) bgMusicRef.current.muted = isMuted;
+    if (playingMusicRef.current) playingMusicRef.current.muted = isMuted;
+    if (callFriendAudioRef.current) callFriendAudioRef.current.muted = isMuted;
+  }, [isMuted]);
 
   useEffect(() => {
     if (!bgMusicRef.current || !playingMusicRef.current) return;
@@ -152,6 +160,7 @@ const MillionaireGame = () => {
     const randomSound = INCORRECT_SOUNDS[Math.floor(Math.random() * INCORRECT_SOUNDS.length)];
     const audio = new Audio(randomSound);
     audio.volume = 0.8;
+    audio.muted = isMuted;
     
     let isGameOverTriggered = false;
     const triggerGameOver = () => {
@@ -197,6 +206,7 @@ const MillionaireGame = () => {
         const randomSound = CORRECT_SOUNDS[Math.floor(Math.random() * CORRECT_SOUNDS.length)];
         const audio = new Audio(randomSound);
         audio.volume = 0.8;
+        audio.muted = isMuted;
         
         const nextStep = () => {
           if (currentStep === 14) {
@@ -222,6 +232,7 @@ const MillionaireGame = () => {
         const randomSound = INCORRECT_SOUNDS[Math.floor(Math.random() * INCORRECT_SOUNDS.length)];
         const audio = new Audio(randomSound);
         audio.volume = 0.8;
+        audio.muted = isMuted;
         
         let isGameOverTriggered = false;
         const triggerGameOver = () => {
@@ -303,6 +314,7 @@ const MillionaireGame = () => {
 
     callFriendAudioRef.current = new Audio(callFriendSoundFile);
     callFriendAudioRef.current.volume = 0.8;
+    callFriendAudioRef.current.muted = isMuted;
     callFriendAudioRef.current.play().catch(e => console.log("Call friend audio prevented:", e));
   };
 
