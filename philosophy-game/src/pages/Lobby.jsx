@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { ref, onValue } from 'firebase/database';
+import { ref, onValue, remove } from 'firebase/database';
 import { database } from '../firebase/config';
 import { startGame } from '../services/gameService';
 import RoomCode from '../components/RoomCode';
 import { useAudioContext } from '../contexts/AudioContext';
 import questionsData from '../data/questions.json';
-import { Users, Play, Info } from 'lucide-react';
+import { Users, Play, Info, LogOut } from 'lucide-react';
 import logo from '../assets/logo21.png';
 import bgMusicFile from "../../sound_effect/backgroundmusicbeginning/Nh¡c chuông Nhac gameshow 'Dau truong 100.mp3";
 
@@ -69,8 +69,29 @@ const Lobby = () => {
     // navigate will be handled by the onValue listener when gameState changes
   };
 
+  const handleLeaveRoom = async () => {
+    if (playerId) {
+      const playerRef = ref(database, `rooms/${roomCode}/players/${playerId}`);
+      try {
+        await remove(playerRef);
+      } catch (error) {
+        console.error("Error removing player:", error);
+      }
+    }
+    navigate('/');
+  };
+
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-6">
+    <div className="flex-1 flex flex-col items-center justify-center p-6 relative">
+      <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
+        <button 
+          onClick={handleLeaveRoom}
+          className="flex items-center gap-2 text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-700 px-4 py-2 rounded-xl border border-slate-700 transition-colors"
+        >
+          <LogOut size={20} /> <span className="hidden sm:inline font-medium">Thoát phòng</span>
+        </button>
+      </div>
+
       <div className="w-full max-w-2xl flex flex-col gap-8 mt-12">
         
         <div className="panel flex flex-col items-center text-center relative pt-20 md:pt-24 mt-16 md:mt-20">

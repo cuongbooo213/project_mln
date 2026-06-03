@@ -47,7 +47,7 @@ const MillionaireGame = () => {
   const [questions, setQuestions] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [gameState, setGameState] = useState('intro'); // intro, playing, grace, answering, correct, wrong, walk_away, won
-  const [timer, setTimer] = useState(20);
+  const [timer, setTimer] = useState(60);
   const [graceTimer, setGraceTimer] = useState(3);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   
@@ -132,7 +132,7 @@ const MillionaireGame = () => {
 
   const startGame = () => {
     setGameState('playing');
-    setTimer(20);
+    setTimer(60);
   };
 
   useEffect(() => {
@@ -213,7 +213,7 @@ const MillionaireGame = () => {
             setGameState('won');
           } else {
             setCurrentStep(s => s + 1);
-            setTimer(20);
+            setTimer(60);
             setGameState('playing');
             setSelectedAnswer(null);
             setRemovedAnswers([]);
@@ -340,7 +340,7 @@ const MillionaireGame = () => {
       
       <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 text-left space-y-2 max-w-md w-full mb-8">
         <p className="text-emerald-400 font-bold mb-4 border-b border-slate-700 pb-2">Luật chơi:</p>
-        <p>• 20 giây suy nghĩ mỗi câu hỏi.</p>
+        <p>• 60 giây suy nghĩ mỗi câu hỏi.</p>
         <p>• Nếu hết giờ, bạn có 3 giây cuối để chọn nhanh.</p>
         <p>• 3 quyền trợ giúp: 50-50, Khán giả, Gọi điện.</p>
         <p>• Mốc an toàn: Câu 5 (5tr) và Câu 10 (22tr).</p>
