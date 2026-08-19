@@ -264,16 +264,17 @@ const MarketGame = () => {
               {/* Phase controls */}
               <div className="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
                 <h4 className="font-bold text-white mb-1">Điều Khiển</h4>
-                {phase === 'shopping' && (
+                {phase === 'shopping' ? (
                   <button onClick={handleMissionPhase}
-                    className="bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-lg font-bold flex items-center justify-center gap-2">
-                    <Brain size={18} /> Chuyển Sang Nhiệm Vụ
+                    className="bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 shadow-lg shadow-red-500/20">
+                    <Brain size={18} /> Chốt Hàng — Chuyển Sang Trả Lời Câu Hỏi
+                  </button>
+                ) : (
+                  <button onClick={handleStartRound} disabled={currentRound + 1 >= marketItemsData.length}
+                    className="bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-lg font-bold disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20">
+                    <SkipForward size={18} /> {currentRound + 1 >= marketItemsData.length ? 'Đã hết các vòng' : 'Chuyển Sang Vòng Tiếp Theo'}
                   </button>
                 )}
-                <button onClick={handleStartRound} disabled={currentRound + 1 >= marketItemsData.length}
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-lg font-bold disabled:opacity-50 flex items-center justify-center gap-2">
-                  <SkipForward size={18} /> {currentRound + 1 >= marketItemsData.length ? 'Hết vòng' : 'Vòng Tiếp Theo'}
-                </button>
                 <button onClick={handleFinish}
                   className="bg-slate-700 hover:bg-slate-600 text-white py-2.5 rounded-lg font-bold flex items-center justify-center gap-2">
                   🏁 Kết Thúc Game
