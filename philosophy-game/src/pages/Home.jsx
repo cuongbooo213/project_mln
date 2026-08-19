@@ -64,6 +64,7 @@ const Home = () => {
       </div>
 
       {/* Cột 3: Mật Mã Lịch Sử */}
+      {false && (
       <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-12 bg-slate-900/20 hover:bg-slate-800/40 transition-all duration-500 group">
         <div className="mb-8 transform group-hover:scale-105 transition-transform duration-500 text-red-500 bg-white/10 p-6 rounded-full shadow-[0_0_30px_rgba(239,68,68,0.3)] ring-4 ring-red-500/30">
           <BookOpen size={96} />
@@ -94,6 +95,7 @@ const Home = () => {
           </button>
         </div>
       </div>
+      )}
 
       {/* Cột 4: Chợ Lịch Sử */}
       <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-12 bg-slate-900/20 hover:bg-slate-800/40 transition-all duration-500 group">

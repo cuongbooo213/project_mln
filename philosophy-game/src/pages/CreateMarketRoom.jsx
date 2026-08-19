@@ -8,18 +8,21 @@ const CreateMarketRoom = () => {
   const [startingXu, setStartingXu] = useState(1000);
   const [numTeams, setNumTeams] = useState(9);
   const [playersPerTeam, setPlayersPerTeam] = useState(7);
-  const [auctionTimer, setAuctionTimer] = useState(15);
-  const [missionTimer, setMissionTimer] = useState(120);
+  const [secretCode, setSecretCode] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!name.trim()) return;
+    if (secretCode !== 'vnr202') {
+      alert("❌ Mã mở chợ không chính xác! Bạn không có quyền mở chợ.");
+      return;
+    }
     setLoading(true);
     try {
       const { roomCode, playerId } = await createMarketRoom(name, {
-        numTeams, playersPerTeam, startingXu, auctionTimer, missionTimer,
+        numTeams, playersPerTeam, startingXu
       });
       navigate(`/market-lobby/${roomCode}`, { state: { playerId, isHost: true } });
     } catch (error) {
@@ -55,16 +58,11 @@ const CreateMarketRoom = () => {
               className="input-field" placeholder="Nhập tên..." maxLength={20} required />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">💰 Xu khởi điểm</label>
               <input type="number" value={startingXu} onChange={(e) => setStartingXu(Number(e.target.value))}
                 className="input-field" min="500" max="5000" step="100" required />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">⏱️ Thời gian đấu giá (s)</label>
-              <input type="number" value={auctionTimer} onChange={(e) => setAuctionTimer(Number(e.target.value))}
-                className="input-field" min="10" max="60" required />
             </div>
           </div>
 
@@ -82,12 +80,12 @@ const CreateMarketRoom = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">🧩 Thời gian giải nhiệm vụ (s)</label>
-            <input type="number" value={missionTimer} onChange={(e) => setMissionTimer(Number(e.target.value))}
-              className="input-field" min="30" max="300" required />
+            <label className="block text-sm font-medium text-amber-400 mb-2">🔑 Mã đặc biệt (Dành cho Host)</label>
+            <input type="password" value={secretCode} onChange={(e) => setSecretCode(e.target.value)}
+              className="input-field border-amber-500/30 focus:border-amber-500" placeholder="Nhập mã mở chợ..." required />
           </div>
 
-          <button type="submit" disabled={loading || !name.trim()}
+          <button type="submit" disabled={loading || !name.trim() || !secretCode.trim()}
             className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold py-3 px-6 rounded-xl w-full transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <Store size={20} />

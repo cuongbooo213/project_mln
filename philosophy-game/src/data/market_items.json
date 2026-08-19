@@ -2,10 +2,10 @@
   {
     "roundId": "round_01",
     "mission": {
-      "title": "Sự ra đời của Đảng Cộng sản Việt Nam",
-      "description": "Hãy ghép các dữ kiện đã mua để trả lời: Sự kiện gì? Diễn ra khi nào? Ở đâu? Ai chủ trì? Văn kiện nào được thông qua?",
-      "correctAnswer": "1930",
-      "acceptableAnswers": ["1930", "hội nghị thành lập đảng", "3/2/1930"],
+      "title": "Thống nhất đất nước về mặt nhà nước",
+      "description": "Ghép các dữ kiện để trả lời: Sự kiện Tổng tuyển cử bầu Quốc hội chung diễn ra vào ngày nào?",
+      "correctAnswer": "25/4/1976",
+      "acceptableAnswers": ["25/4/1976", "25 tháng 4 năm 1976", "25/4", "1976"],
       "bonusPoints": 500
     },
     "items": [
@@ -13,53 +13,53 @@
         "id": "r1_date",
         "type": "date",
         "label": "📅 Mốc thời gian",
-        "content": "Ngày 3 tháng 2 năm 1930 — Mốc thời gian quan trọng của sự kiện.",
-        "hint": "Một con số gắn liền với sự khởi đầu vĩ đại...",
+        "content": "Ngày 25/4/1976 — Cuộc Tổng tuyển cử bầu Quốc hội chung của nước Việt Nam thống nhất được tiến hành.",
+        "hint": "Một ngày mang ý nghĩa thống nhất toàn dân tộc...",
         "startPrice": 100,
         "isFake": false
       },
       {
         "id": "r1_person",
         "type": "person",
-        "label": "👤 Nhân vật",
-        "content": "Nguyễn Ái Quốc — Người chủ trì hội nghị hợp nhất 3 tổ chức cộng sản.",
-        "hint": "Một nhân vật vĩ đại đóng vai trò then chốt...",
+        "label": "👤 Nhân vật A",
+        "content": "Đồng chí Trường Chinh — Trưởng đoàn đại biểu miền Bắc trong Hội nghị Hiệp thương, sau được bầu làm Chủ tịch Ủy ban Thường vụ Quốc hội.",
+        "hint": "Người dẫn đầu đoàn đại biểu phía Bắc...",
         "startPrice": 150,
+        "isFake": false
+      },
+      {
+        "id": "r1_person2",
+        "type": "person",
+        "label": "👤 Nhân vật B",
+        "content": "Đồng chí Tôn Đức Thắng — Được Quốc hội bầu làm Chủ tịch nước Cộng hòa xã hội chủ nghĩa Việt Nam.",
+        "hint": "Người đứng đầu nhà nước thống nhất...",
+        "startPrice": 140,
+        "isFake": false
+      },
+      {
+        "id": "r1_event",
+        "type": "clue",
+        "label": "🔎 Manh mối A",
+        "content": "Hơn 23 triệu cử tri (đạt 98,77%) đã bầu ra 492 đại biểu Quốc hội gồm đủ thành phần trên cả nước.",
+        "hint": "Một con số ấn tượng về sự tham gia của nhân dân...",
+        "startPrice": 100,
         "isFake": false
       },
       {
         "id": "r1_place",
         "type": "place",
         "label": "📍 Địa điểm",
-        "content": "Cửu Long, Hương Cảng (Hong Kong) — Nơi diễn ra hội nghị.",
-        "hint": "Sự kiện không diễn ra trên đất Việt...",
+        "content": "Kỳ họp thứ nhất Quốc hội thống nhất họp tại Thủ đô Hà Nội (24/6 – 3/7/1976).",
+        "hint": "Nơi diễn ra kỳ họp lịch sử...",
         "startPrice": 120,
-        "isFake": false
-      },
-      {
-        "id": "r1_doc",
-        "type": "document",
-        "label": "📜 Văn kiện",
-        "content": "Chánh cương vắn tắt, Sách lược vắn tắt — Cương lĩnh chính trị đầu tiên của Đảng.",
-        "hint": "Nền tảng tư tưởng quan trọng được thông qua...",
-        "startPrice": 180,
         "isFake": false
       },
       {
         "id": "r1_clue1",
         "type": "clue",
-        "label": "🔎 Manh mối A",
-        "content": "Sự kiện hợp nhất 3 tổ chức: An Nam CSĐ, Đông Dương CSĐ, Đông Dương CS Liên Đoàn thành một đảng duy nhất.",
-        "hint": "Liên quan đến sự thống nhất các lực lượng...",
-        "startPrice": 100,
-        "isFake": false
-      },
-      {
-        "id": "r1_clue2",
-        "type": "clue",
         "label": "🔎 Manh mối B",
-        "content": "Sự kiện đánh dấu sự ra đời của chính đảng tiên phong của giai cấp công nhân Việt Nam.",
-        "hint": "Một bước ngoặt lịch sử quan trọng...",
+        "content": "Quốc hội quyết định đặt tên nước là Cộng hòa xã hội chủ nghĩa Việt Nam, đổi tên Sài Gòn thành Thành phố Hồ Chí Minh.",
+        "hint": "Những quyết định quan trọng về quốc hiệu và tên thành phố...",
         "startPrice": 90,
         "isFake": false
       },
@@ -67,38 +67,20 @@
         "id": "r1_rare",
         "type": "rare",
         "label": "💎 Thông tin đặc biệt",
-        "content": "⭐ Ngày 3/2 hàng năm được chọn làm Ngày kỷ niệm thành lập Đảng Cộng sản Việt Nam. Sử dụng đúng: +100 điểm bonus.",
-        "hint": "Thông tin hiếm, có thể mang lại phần thưởng lớn...",
+        "content": "⭐ Hội nghị Hiệp thương Bắc-Nam (15-21/11/1975) tại Sài Gòn do Trường Chinh và Phạm Hùng dẫn đầu hai đoàn. Bonus +100 điểm.",
+        "hint": "Cuộc gặp lịch sử giữa hai miền trước Tổng tuyển cử...",
         "startPrice": 250,
         "isFake": false
-      },
-      {
-        "id": "r1_fake1",
-        "type": "clue",
-        "label": "🔎 Manh mối C",
-        "content": "⚠️ HÀNG GIẢ: Sự kiện diễn ra tại Quảng Châu, Trung Quốc vào năm 1925.",
-        "hint": "Thông tin về địa điểm và thời gian...",
-        "startPrice": 80,
-        "isFake": true
-      },
-      {
-        "id": "r1_fake2",
-        "type": "person",
-        "label": "👤 Nhân vật liên quan",
-        "content": "⚠️ HÀNG GIẢ: Phan Bội Châu là người triệu tập hội nghị thành lập.",
-        "hint": "Một nhân vật lịch sử nổi tiếng...",
-        "startPrice": 120,
-        "isFake": true
       }
     ]
   },
   {
     "roundId": "round_02",
     "mission": {
-      "title": "Chiến thắng lịch sử Điện Biên Phủ",
-      "description": "Ghép các thông tin để xác định: Chiến dịch nào? Kéo dài bao lâu? Kết quả? Tướng giặc bị bắt là ai?",
-      "correctAnswer": "1954",
-      "acceptableAnswers": ["1954", "điện biên phủ", "7/5/1954"],
+      "title": "Đại hội đại biểu toàn quốc lần thứ IV",
+      "description": "Ghép các thông tin để trả lời: Đại hội IV họp năm nào? Quyết định đổi tên Đảng thành gì? Ai được bầu làm Tổng Bí thư?",
+      "correctAnswer": "1976",
+      "acceptableAnswers": ["1976", "đại hội iv", "đại hội 4", "12/1976"],
       "bonusPoints": 500
     },
     "items": [
@@ -106,8 +88,8 @@
         "id": "r2_date",
         "type": "date",
         "label": "📅 Mốc thời gian",
-        "content": "Ngày 7 tháng 5 năm 1954 — Ngày chiến thắng hoàn toàn.",
-        "hint": "Một ngày lừng lẫy trong lịch sử...",
+        "content": "Từ ngày 14 đến ngày 20/12/1976 — Đại hội lần thứ IV của Đảng họp tại Hà Nội.",
+        "hint": "Cuối một năm đầy sự kiện trọng đại...",
         "startPrice": 100,
         "isFake": false
       },
@@ -115,83 +97,65 @@
         "id": "r2_person",
         "type": "person",
         "label": "👤 Nhân vật",
-        "content": "Đại tướng Võ Nguyên Giáp — Tổng tư lệnh chiến dịch, thiên tài quân sự.",
-        "hint": "Người chỉ huy tối cao phía Việt Nam...",
+        "content": "Đồng chí Lê Duẩn — Được bầu làm Tổng Bí thư của Đảng tại Đại hội IV.",
+        "hint": "Người đứng đầu Đảng trong giai đoạn mới...",
         "startPrice": 150,
-        "isFake": false
-      },
-      {
-        "id": "r2_place",
-        "type": "place",
-        "label": "📍 Địa điểm",
-        "content": "Thung lũng Điện Biên Phủ, tỉnh Lai Châu (nay là Điện Biên).",
-        "hint": "Một thung lũng nằm ở vùng Tây Bắc...",
-        "startPrice": 120,
         "isFake": false
       },
       {
         "id": "r2_event",
         "type": "clue",
         "label": "⚔️ Sự kiện",
-        "content": "56 ngày đêm 'khoét núi, ngủ hầm, mưa dầm, cơm vắt' — Chiến dịch kéo dài từ 13/3 đến 7/5.",
-        "hint": "Một chiến dịch đầy gian khổ và hy sinh...",
+        "content": "Đại hội quyết định đổi tên Đảng Lao động Việt Nam thành Đảng Cộng sản Việt Nam.",
+        "hint": "Một quyết định quan trọng về tên gọi tổ chức...",
         "startPrice": 130,
-        "isFake": false
-      },
-      {
-        "id": "r2_person2",
-        "type": "person",
-        "label": "👤 Tướng giặc",
-        "content": "Tướng De Castries — Bị bắt sống tại hầm chỉ huy vào buổi chiều tà.",
-        "hint": "Chỉ huy tối cao của quân đội đối phương...",
-        "startPrice": 140,
         "isFake": false
       },
       {
         "id": "r2_doc",
         "type": "document",
         "label": "📜 Văn kiện",
-        "content": "Hiệp định Genève (1954) — Được ký kết sau chiến thắng, công nhận độc lập Việt Nam.",
-        "hint": "Một hiệp định quốc tế quan trọng...",
+        "content": "Đại hội thông qua Kế hoạch nhà nước 5 năm (1976-1980), đẩy mạnh công nghiệp hóa xã hội chủ nghĩa là nhiệm vụ trung tâm.",
+        "hint": "Một kế hoạch kinh tế dài hạn đầu tiên sau thống nhất...",
         "startPrice": 160,
+        "isFake": false
+      },
+      {
+        "id": "r2_clue1",
+        "type": "clue",
+        "label": "🔎 Manh mối A",
+        "content": "Có 1.008 đại biểu thay mặt hơn 1,5 triệu đảng viên, 29 đoàn quốc tế tham dự. Ban Chấp hành TW gồm 101 ủy viên chính thức.",
+        "hint": "Quy mô của Đại hội lớn nhất từ trước đến nay...",
+        "startPrice": 90,
+        "isFake": false
+      },
+      {
+        "id": "r2_clue2",
+        "type": "clue",
+        "label": "🔎 Manh mối B",
+        "content": "Đại hội nêu 3 đặc điểm lớn: tiến thẳng lên CNXH bỏ qua TBCN, có thuận lợi nhưng nhiều khó khăn, đấu tranh 'ai thắng ai' còn gay go.",
+        "hint": "Ba nhận định lớn về tình hình cách mạng...",
+        "startPrice": 100,
         "isFake": false
       },
       {
         "id": "r2_rare",
         "type": "rare",
         "label": "💎 Thông tin đặc biệt",
-        "content": "⭐ Chiến thắng được mệnh danh là 'Lừng lẫy năm châu, chấn động địa cầu'. Bonus +100 điểm.",
-        "hint": "Một danh hiệu vang dội toàn thế giới...",
+        "content": "⭐ Đại hội IV là 'Đại hội toàn thắng của sự nghiệp giải phóng dân tộc, thống nhất Tổ quốc'. Bonus +100 điểm.",
+        "hint": "Danh hiệu đặc biệt gắn với Đại hội này...",
         "startPrice": 220,
         "isFake": false
-      },
-      {
-        "id": "r2_fake1",
-        "type": "date",
-        "label": "📅 Mốc thời gian phụ",
-        "content": "⚠️ HÀNG GIẢ: Chiến dịch kết thúc vào ngày 30/4/1954.",
-        "hint": "Một mốc thời gian đáng nhớ...",
-        "startPrice": 70,
-        "isFake": true
-      },
-      {
-        "id": "r2_fake2",
-        "type": "clue",
-        "label": "🔎 Manh mối bổ sung",
-        "content": "⚠️ HÀNG GIẢ: Quân đội Mỹ trực tiếp tham chiến tại trận này.",
-        "hint": "Về lực lượng tham gia...",
-        "startPrice": 90,
-        "isFake": true
       }
     ]
   },
   {
     "roundId": "round_03",
     "mission": {
-      "title": "Đường lối Đổi Mới",
-      "description": "Xác định: Đại hội nào? Năm nào? Ai là Tổng Bí thư? Nội dung đổi mới chính là gì?",
-      "correctAnswer": "1986",
-      "acceptableAnswers": ["1986", "đại hội vi", "đại hội 6", "đổi mới"],
+      "title": "Khoán sản phẩm trong nông nghiệp",
+      "description": "Ghép thông tin để trả lời: Chỉ thị Khoán 100 được ban hành ngày nào? Nội dung chính là gì?",
+      "correctAnswer": "Khoan 100",
+      "acceptableAnswers": ["khoán 100", "khoan 100", "100", "18/1/1981", "khoán sản phẩm"],
       "bonusPoints": 500
     },
     "items": [
@@ -199,73 +163,205 @@
         "id": "r3_date",
         "type": "date",
         "label": "📅 Mốc thời gian",
-        "content": "Tháng 12 năm 1986 — Thời điểm diễn ra Đại hội.",
-        "hint": "Cuối một thập niên đầy biến động...",
+        "content": "Ngày 18/1/1981 — Ban Bí thư ban hành Chỉ thị số 100-CT/TW về khoán sản phẩm.",
+        "hint": "Đầu một năm mới đầy hy vọng cho nông dân...",
         "startPrice": 100,
-        "isFake": false
-      },
-      {
-        "id": "r3_person",
-        "type": "person",
-        "label": "👤 Nhân vật",
-        "content": "Nguyễn Văn Linh — Được bầu làm Tổng Bí thư tại Đại hội này.",
-        "hint": "Người đứng đầu Đảng trong giai đoạn mới...",
-        "startPrice": 150,
         "isFake": false
       },
       {
         "id": "r3_event",
         "type": "clue",
         "label": "⚔️ Sự kiện",
-        "content": "Đại hội đại biểu toàn quốc lần thứ VI của Đảng — Đề ra đường lối đổi mới toàn diện.",
-        "hint": "Một đại hội mang tính bước ngoặt...",
+        "content": "Hội nghị Trung ương 6 (8/1979) — Bước đột phá đầu tiên với chủ trương cho 'sản xuất bung ra'.",
+        "hint": "Một hội nghị mang tính đột phá trước Khoán 100...",
         "startPrice": 130,
+        "isFake": false
+      },
+      {
+        "id": "r3_clue1",
+        "type": "clue",
+        "label": "🔎 Manh mối A",
+        "content": "Mỗi xã viên nhận mức khoán theo diện tích, tự làm khâu cấy, chăm sóc, thu hoạch. Vượt khoán được hưởng và tự do mua bán.",
+        "hint": "Cơ chế mới giúp người nông dân chủ động hơn...",
+        "startPrice": 100,
+        "isFake": false
+      },
+      {
+        "id": "r3_clue2",
+        "type": "clue",
+        "label": "🔎 Manh mối B",
+        "content": "Trước Khoán 100, ở miền Bắc đã xuất hiện hiện tượng 'khoán chui' và 'xé rào' trong hợp tác xã nông nghiệp.",
+        "hint": "Những dấu hiệu tự phát của nông dân trước chính sách chính thức...",
+        "startPrice": 90,
         "isFake": false
       },
       {
         "id": "r3_doc",
         "type": "document",
         "label": "📜 Văn kiện",
-        "content": "Nghị quyết Đại hội VI: Chuyển đổi từ kinh tế bao cấp sang kinh tế thị trường định hướng XHCN.",
-        "hint": "Một quyết sách làm thay đổi vận mệnh đất nước...",
+        "content": "Chỉ thị số 100-CT/TW về khoán sản phẩm đến nhóm và người lao động trong các hợp tác xã nông nghiệp.",
+        "hint": "Một chỉ thị làm thay đổi diện mạo nông nghiệp...",
         "startPrice": 170,
-        "isFake": false
-      },
-      {
-        "id": "r3_clue1",
-        "type": "clue",
-        "label": "🔎 Manh mối",
-        "content": "Trước Đại hội, đất nước lâm vào khủng hoảng kinh tế - xã hội trầm trọng, lạm phát phi mã.",
-        "hint": "Bối cảnh dẫn đến sự thay đổi...",
-        "startPrice": 90,
         "isFake": false
       },
       {
         "id": "r3_rare",
         "type": "rare",
         "label": "💎 Thông tin đặc biệt",
-        "content": "⭐ Đổi Mới được ví như 'Perestroika của Việt Nam'. Mở ra kỷ nguyên hội nhập quốc tế. Bonus +100 điểm.",
-        "hint": "Một so sánh mang tầm quốc tế...",
+        "content": "⭐ Sản lượng lương thực bình quân tăng từ 13,4 triệu tấn/năm (1976-1980) lên 17 triệu tấn/năm (1981-1985) nhờ Khoán 100. Bonus +100 điểm.",
+        "hint": "Con số ấn tượng chứng minh hiệu quả của chính sách mới...",
         "startPrice": 200,
+        "isFake": false
+      }
+    ]
+  },
+  {
+    "roundId": "round_04",
+    "mission": {
+      "title": "Chiến tranh biên giới Tây Nam và giải phóng Campuchia",
+      "description": "Ghép thông tin: Ai xâm lược biên giới Tây Nam? Phnom Penh được giải phóng ngày nào? Hiệp ước nào được ký?",
+      "correctAnswer": "7/1/1979",
+      "acceptableAnswers": ["7/1/1979", "pôn pốt", "pol pot", "1979", "campuchia"],
+      "bonusPoints": 500
+    },
+    "items": [
+      {
+        "id": "r4_date",
+        "type": "date",
+        "label": "📅 Mốc thời gian",
+        "content": "Ngày 7/1/1979 — Quân tình nguyện Việt Nam phối hợp giải phóng Phnôm Pênh, đánh đổ chế độ diệt chủng.",
+        "hint": "Một ngày đánh dấu sự sụp đổ của chế độ diệt chủng...",
+        "startPrice": 100,
         "isFake": false
       },
       {
-        "id": "r3_fake1",
+        "id": "r4_person",
         "type": "person",
-        "label": "👤 Nhân vật liên quan",
-        "content": "⚠️ HÀNG GIẢ: Lê Duẩn là Tổng Bí thư được bầu tại Đại hội Đổi Mới.",
-        "hint": "Một nhân vật lãnh đạo cấp cao...",
-        "startPrice": 110,
-        "isFake": true
+        "label": "👤 Thế lực",
+        "content": "Tập đoàn Pôn Pốt — Thi hành chính sách diệt chủng ở Campuchia và tăng cường chống Việt Nam.",
+        "hint": "Kẻ thù gây ra thảm họa nhân đạo lớn nhất Đông Nam Á...",
+        "startPrice": 150,
+        "isFake": false
       },
       {
-        "id": "r3_fake2",
+        "id": "r4_event",
+        "type": "clue",
+        "label": "⚔️ Sự kiện",
+        "content": "Từ tháng 4/1975, Pôn Pốt cho quân chiếm đảo Thổ Chu, Phú Quốc và tấn công lấn chiếm toàn tuyến biên giới Tây Nam.",
+        "hint": "Hành động xâm lược đầu tiên của kẻ thù...",
+        "startPrice": 130,
+        "isFake": false
+      },
+      {
+        "id": "r4_doc",
+        "type": "document",
+        "label": "📜 Văn kiện",
+        "content": "Ngày 18/2/1979, Việt Nam và Campuchia ký Hiệp ước hòa bình, hữu nghị và hợp tác.",
+        "hint": "Một hiệp ước giữa hai quốc gia láng giềng sau chiến thắng...",
+        "startPrice": 160,
+        "isFake": false
+      },
+      {
+        "id": "r4_clue1",
+        "type": "clue",
+        "label": "🔎 Manh mối A",
+        "content": "Cuối tháng 12/1978, Pôn Pốt huy động tổng lực tiến công quy mô lớn trên toàn tuyến biên giới Tây Nam.",
+        "hint": "Cuộc tấn công lớn nhất buộc Việt Nam phải phản công...",
+        "startPrice": 90,
+        "isFake": false
+      },
+      {
+        "id": "r4_clue2",
+        "type": "clue",
+        "label": "🔎 Manh mối B",
+        "content": "Việt Nam, Lào, Campuchia cùng bán đảo Đông Dương, cùng kẻ thù chung. Đoàn kết 3 nước là truyền thống và quy luật phát triển.",
+        "hint": "Mối quan hệ đặc biệt giữa ba nước Đông Dương...",
+        "startPrice": 100,
+        "isFake": false
+      },
+      {
+        "id": "r4_rare",
+        "type": "rare",
+        "label": "💎 Thông tin đặc biệt",
+        "content": "⭐ Hành động của Việt Nam là chính nghĩa, xuất phát từ quyền tự vệ chính đáng theo Điều 51 Hiến chương Liên hợp quốc. Bonus +100 điểm.",
+        "hint": "Cơ sở pháp lý quốc tế cho hành động của Việt Nam...",
+        "startPrice": 220,
+        "isFake": false
+      }
+    ]
+  },
+  {
+    "roundId": "round_05",
+    "mission": {
+      "title": "Chiến tranh bảo vệ biên giới phía Bắc",
+      "description": "Ghép thông tin: Ngày nào Trung Quốc tấn công biên giới? Huy động bao nhiêu quân? Tuyên bố rút quân ngày nào?",
+      "correctAnswer": "17/2/1979",
+      "acceptableAnswers": ["17/2/1979", "17 tháng 2", "1979", "biên giới phía bắc"],
+      "bonusPoints": 500
+    },
+    "items": [
+      {
+        "id": "r5_date",
         "type": "date",
-        "label": "📅 Thời gian bổ sung",
-        "content": "⚠️ HÀNG GIẢ: Đường lối Đổi Mới được đề ra vào năm 1975, ngay sau thống nhất.",
-        "hint": "Một mốc thời gian quan trọng...",
-        "startPrice": 80,
-        "isFake": true
+        "label": "📅 Mốc thời gian",
+        "content": "Ngày 17/2/1979 — Trung Quốc đồng loạt tấn công toàn tuyến biên giới phía Bắc từ Lai Châu đến Quảng Ninh.",
+        "hint": "Một ngày tháng 2 đau thương trong lịch sử...",
+        "startPrice": 100,
+        "isFake": false
+      },
+      {
+        "id": "r5_event",
+        "type": "clue",
+        "label": "⚔️ Sự kiện",
+        "content": "Trung Quốc huy động hơn 60 vạn quân tấn công, gây thiệt hại rất nặng nề cho các tỉnh biên giới.",
+        "hint": "Quy mô lực lượng xâm lược cực kỳ lớn...",
+        "startPrice": 130,
+        "isFake": false
+      },
+      {
+        "id": "r5_clue1",
+        "type": "clue",
+        "label": "🔎 Manh mối A",
+        "content": "Năm 1978, Trung Quốc tuyên bố rút chuyên gia, cắt viện trợ cho Việt Nam, liên tiếp lấn chiếm gây xung đột.",
+        "hint": "Các động thái leo thang trước khi chiến tranh nổ ra...",
+        "startPrice": 90,
+        "isFake": false
+      },
+      {
+        "id": "r5_clue2",
+        "type": "clue",
+        "label": "🔎 Manh mối B",
+        "content": "Ngày 5/3/1979, Trung Quốc tuyên bố rút quân, nhưng chiến đấu vẫn diễn ra nhiều năm, đặc biệt tại Vị Xuyên (12/7/1984).",
+        "hint": "Cuộc chiến không kết thúc ngay sau tuyên bố...",
+        "startPrice": 100,
+        "isFake": false
+      },
+      {
+        "id": "r5_place",
+        "type": "place",
+        "label": "📍 Địa điểm",
+        "content": "Mặt trận Vị Xuyên, Hà Giang — Điểm nóng chiến đấu ác liệt nhất, đặc biệt ngày 12/7/1984.",
+        "hint": "Nơi ghi dấu trận chiến khốc liệt nhất sau 1979...",
+        "startPrice": 140,
+        "isFake": false
+      },
+      {
+        "id": "r5_doc",
+        "type": "document",
+        "label": "📜 Bối cảnh",
+        "content": "Việt Nam và Trung Quốc là láng giềng có quan hệ hữu nghị truyền thống. Trong kháng chiến, Trung Quốc đã giúp đỡ Việt Nam to lớn.",
+        "hint": "Mối quan hệ lịch sử phức tạp giữa hai nước...",
+        "startPrice": 120,
+        "isFake": false
+      },
+      {
+        "id": "r5_rare",
+        "type": "rare",
+        "label": "💎 Thông tin đặc biệt",
+        "content": "⭐ Quân dân các tỉnh biên giới phía Bắc đã kiên cường chiến đấu bảo vệ từng tấc đất Tổ quốc, được nhân dân thế giới ủng hộ. Bonus +100 điểm.",
+        "hint": "Tinh thần bất khuất của quân dân biên giới...",
+        "startPrice": 250,
+        "isFake": false
       }
     ]
   }

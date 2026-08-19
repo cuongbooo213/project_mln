@@ -2,19 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { getServerTime } from '../firebase/timeSync';
 import { Gavel, Coins } from 'lucide-react';
 
-const AuctionPanel = ({ auction, teams, myTeamId, onBid, myXu }) => {
-  const [seconds, setSeconds] = useState(0);
-  const [customBid, setCustomBid] = useState('');
-
-  useEffect(() => {
-    if (!auction?.isActive) return;
-    const interval = setInterval(() => {
-      const now = getServerTime();
-      const remaining = Math.max(0, Math.ceil((auction.endTime - now) / 1000));
-      setSeconds(remaining);
-    }, 300);
-    return () => clearInterval(interval);
-  }, [auction?.endTime, auction?.isActive]);
+const AuctionPanel = ({ auction, teams, myTeamId, onToggleHand, myXu, isLeader }) => {
+  const isRaising = !!auction?.raisedHands?.[myTeamId];
 
   if (!auction || !auction.isActive) {
     return (
@@ -26,22 +15,10 @@ const AuctionPanel = ({ auction, teams, myTeamId, onBid, myXu }) => {
     );
   }
 
-  const currentBidderTeam = teams[auction.currentBidder];
-  const isMyTeamLeading = auction.currentBidder === myTeamId;
-  const minBid = auction.currentBid + 50;
 
-  const handleQuickBid = (increment) => {
-    const amount = auction.currentBid + increment;
-    if (amount > myXu) return;
-    onBid(amount);
-  };
 
-  const handleCustomBid = (e) => {
-    e.preventDefault();
-    const amount = parseInt(customBid);
-    if (!amount || amount <= auction.currentBid || amount > myXu) return;
-    onBid(amount);
-    setCustomBid('');
+  const handleToggle = () => {
+    onToggleHand(!isRaising);
   };
 
   return (
@@ -53,74 +30,40 @@ const AuctionPanel = ({ auction, teams, myTeamId, onBid, myXu }) => {
         <p className="text-slate-400 text-sm mt-1">{auction.itemHint || ''}</p>
       </div>
 
-      {/* Current bid */}
+      {/* Current status */}
       <div className="bg-slate-900/80 rounded-xl p-4 mb-4 text-center border border-slate-700">
-        <div className="text-sm text-slate-400 mb-1">Giá hiện tại</div>
-        <div className="text-4xl font-black text-amber-400 flex items-center justify-center gap-2">
-          <Coins size={28} /> {auction.currentBid} Xu
+        <div className="text-sm text-slate-400 mb-1">Trạng thái</div>
+        <div className="text-xl font-bold text-amber-400">
+          Đang chờ Chủ Chợ gọi tên và chốt giá...
         </div>
-        {currentBidderTeam ? (
-          <div className={`text-sm mt-2 font-medium ${isMyTeamLeading ? 'text-green-400' : 'text-red-400'}`}>
-            {isMyTeamLeading ? '✅ Đội bạn đang dẫn đầu!' : `${currentBidderTeam.emoji} ${currentBidderTeam.name} đang dẫn`}
-          </div>
+      </div>
+
+      {/* Hand button */}
+      <div className="flex justify-center mb-4">
+        {isLeader ? (
+          <button
+            onClick={handleToggle}
+            className={`py-4 px-8 rounded-xl font-bold text-xl transition-all shadow-lg flex items-center gap-3 ${
+              isRaising
+                ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-600/30 ring-4 ring-red-500/50'
+                : 'bg-green-600 hover:bg-green-500 text-white shadow-green-600/30'
+            }`}
+          >
+            <span className="text-3xl">🙋</span> 
+            {isRaising ? 'Đang Giơ Tay (Bấm để hạ xuống)' : 'Giơ Tay Phát Biểu!'}
+          </button>
         ) : (
-          <div className="text-sm mt-2 text-slate-500">Chưa có ai đặt giá</div>
+          <div className="py-4 px-8 rounded-xl bg-slate-800 border border-slate-700 text-center w-full max-w-sm">
+            <span className="text-2xl opacity-50 block mb-2">🔒</span>
+            <div className="text-sm font-bold text-slate-400">Chỉ Trưởng Nhóm mới có quyền giơ tay</div>
+            {isRaising && <div className="text-amber-400 text-sm mt-2 font-bold animate-pulse">🙋 👑 Trưởng nhóm đang giơ tay!</div>}
+          </div>
         )}
       </div>
 
-      {/* Timer */}
-      <div className="flex justify-center mb-4">
-        <div className={`w-16 h-16 rounded-full flex items-center justify-center border-4 shadow-lg ${
-          seconds <= 5 ? 'border-red-500 bg-red-900/30 shadow-red-500/30' : 'border-amber-500 bg-slate-900 shadow-amber-500/20'
-        }`}>
-          <span className={`text-2xl font-bold ${seconds <= 5 ? 'text-red-400 animate-pulse' : 'text-white'}`}>
-            {seconds}
-          </span>
-        </div>
-      </div>
 
-      {/* Bid buttons */}
-      {!isMyTeamLeading && seconds > 0 && (
-        <div className="space-y-3">
-          <div className="grid grid-cols-3 gap-2">
-            {[50, 100, 200].map(inc => {
-              const bidAmount = auction.currentBid + inc;
-              const canAfford = bidAmount <= myXu;
-              return (
-                <button key={inc} onClick={() => handleQuickBid(inc)} disabled={!canAfford}
-                  className={`py-3 rounded-xl font-bold text-sm transition-all ${
-                    canAfford
-                      ? 'bg-amber-600 hover:bg-amber-500 text-white shadow-lg hover:scale-105 active:scale-95'
-                      : 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                  }`}>
-                  +{inc} Xu
-                </button>
-              );
-            })}
-          </div>
-          <form onSubmit={handleCustomBid} className="flex gap-2">
-            <input type="number" value={customBid} onChange={e => setCustomBid(e.target.value)}
-              placeholder={`Tối thiểu ${minBid}`} min={minBid} max={myXu}
-              className="flex-1 bg-slate-900 border border-slate-600 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500" />
-            <button type="submit" disabled={!customBid || parseInt(customBid) <= auction.currentBid}
-              className="bg-red-600 hover:bg-red-500 text-white font-bold px-4 py-2 rounded-xl transition-colors disabled:opacity-50 flex items-center gap-1">
-              <Gavel size={16} /> Đặt
-            </button>
-          </form>
-        </div>
-      )}
 
-      {isMyTeamLeading && seconds > 0 && (
-        <div className="text-center py-3 bg-green-900/30 rounded-xl border border-green-500/30 text-green-400 font-medium">
-          🎉 Đội bạn đang thắng! Chờ kết quả...
-        </div>
-      )}
 
-      {seconds === 0 && (
-        <div className="text-center py-3 bg-slate-800 rounded-xl text-slate-400 font-medium">
-          🔨 Phiên đấu giá đã kết thúc
-        </div>
-      )}
 
       <div className="mt-3 text-center text-xs text-slate-500">
         💰 Xu của đội bạn: <span className="text-amber-400 font-bold">{myXu}</span>
