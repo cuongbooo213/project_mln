@@ -1,19 +1,19 @@
 import React from 'react';
-import { Trophy, Medal } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 
-const Leaderboard = ({ players }) => {
-  // players is an object: { id: { name, score } }
-  const sortedPlayers = Object.values(players || {}).sort((a, b) => b.score - a.score);
+const Leaderboard = ({ teams }) => {
+  // teams is an object: { id: { name, score } }
+  const sortedTeams = Object.values(teams || {}).sort((a, b) => b.score - a.score);
 
   return (
     <div className="panel w-full max-w-md mx-auto">
       <div className="flex items-center justify-center gap-3 mb-6">
         <Trophy className="text-yellow-500 w-8 h-8" />
-        <h2 className="text-2xl font-bold m-0">Bảng Xếp Hạng</h2>
+        <h2 className="text-2xl font-bold m-0 text-white">Bảng Xếp Hạng Đội</h2>
       </div>
       
       <div className="flex flex-col gap-3">
-        {sortedPlayers.map((player, idx) => (
+        {sortedTeams.map((team, idx) => (
           <div 
             key={idx} 
             className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 ${
@@ -36,7 +36,7 @@ const Leaderboard = ({ players }) => {
                 idx === 1 ? 'text-slate-200 drop-shadow-[0_0_8px_rgba(203,213,225,0.8)]' :
                 idx === 2 ? 'text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]' :
                 'text-slate-200'
-              }`}>{player.name}</span>
+              }`}>{team.name}</span>
             </div>
             <div className={`font-extrabold text-2xl ${
                 idx === 0 ? 'text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]' :
@@ -44,12 +44,12 @@ const Leaderboard = ({ players }) => {
                 idx === 2 ? 'text-amber-500 drop-shadow-[0_0_10px_rgba(245,158,11,0.8)]' :
                 'text-indigo-300'
               }`}>
-              {player.score} <span className="text-sm font-normal opacity-70">pts</span>
+              {team.score} <span className="text-sm font-normal opacity-70">pts</span>
             </div>
           </div>
         ))}
-        {sortedPlayers.length === 0 && (
-          <div className="text-center text-slate-400 py-4">Chưa có người chơi nào</div>
+        {sortedTeams.length === 0 && (
+          <div className="text-center text-slate-400 py-4">Chưa có đội nào</div>
         )}
       </div>
     </div>

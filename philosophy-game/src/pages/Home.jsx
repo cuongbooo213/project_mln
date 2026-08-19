@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Users, Brain } from 'lucide-react';
+import { Play, Users, Brain, BookOpen, Store } from 'lucide-react';
 import logoSingle from '../assets/logo.jpg';
 import logoMulti from '../assets/logo21.png';
 
@@ -32,7 +32,7 @@ const Home = () => {
       </div>
 
       {/* Cột phải: Philosophy Arena (Chơi Nhiều Người) */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-12 bg-slate-900/20 hover:bg-slate-800/40 transition-all duration-500 group">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-12 border-b lg:border-b-0 lg:border-r border-slate-700/50 bg-slate-900/20 hover:bg-slate-800/40 transition-all duration-500 group">
         <div className="mb-8 transform group-hover:scale-105 transition-transform duration-500">
           <img src={logoMulti} alt="Philosophy Arena Logo" className="w-48 h-48 md:w-56 md:h-56 object-cover rounded-full shadow-[0_0_30px_rgba(99,102,241,0.3)] ring-4 ring-indigo-500/30 bg-white" />
         </div>
@@ -54,11 +54,77 @@ const Home = () => {
           </button>
           
           <button 
-            onClick={() => navigate('/join-room')}
+            onClick={() => navigate('/join-room-old')}
             className="btn-secondary flex-1 !py-4"
           >
             <Users size={24} />
             <span className="text-lg">Tham Gia</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Cột 3: Mật Mã Lịch Sử */}
+      <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-12 bg-slate-900/20 hover:bg-slate-800/40 transition-all duration-500 group">
+        <div className="mb-8 transform group-hover:scale-105 transition-transform duration-500 text-red-500 bg-white/10 p-6 rounded-full shadow-[0_0_30px_rgba(239,68,68,0.3)] ring-4 ring-red-500/30">
+          <BookOpen size={96} />
+        </div>
+        
+        <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-yellow-500 mb-4 text-center">
+          Mật Mã Lịch Sử
+        </h2>
+        <p className="text-lg text-slate-400 mb-10 max-w-sm text-center leading-relaxed">
+          Giải mã các sự kiện lịch sử thông qua suy luận nhóm và ghép nối manh mối.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 w-full justify-center max-w-[400px]">
+          <button 
+            onClick={() => navigate('/create-room')}
+            className="bg-red-600 hover:bg-red-500 text-white flex-1 py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-red-600/20"
+          >
+            <Play size={24} />
+            <span className="text-lg">Tạo Phòng</span>
+          </button>
+          
+          <button 
+            onClick={() => navigate('/join-room')}
+            className="bg-yellow-600 hover:bg-yellow-500 text-white flex-1 py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-yellow-600/20"
+          >
+            <Users size={24} />
+            <span className="text-lg">Tham Gia</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Cột 4: Chợ Lịch Sử */}
+      <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-12 bg-slate-900/20 hover:bg-slate-800/40 transition-all duration-500 group">
+        <div className="mb-8 transform group-hover:scale-105 transition-transform duration-500">
+          <div className="w-48 h-48 md:w-56 md:h-56 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.3)] ring-4 ring-amber-500/30">
+            <Store size={96} className="text-white" />
+          </div>
+        </div>
+        
+        <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-4 text-center">
+          Chợ Lịch Sử
+        </h2>
+        <p className="text-lg text-slate-400 mb-10 max-w-sm text-center leading-relaxed">
+          Đấu giá thông tin, mua bán manh mối và giải nhiệm vụ lịch sử theo đội.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 w-full justify-center max-w-[400px]">
+          <button 
+            onClick={() => navigate('/create-market')}
+            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white flex-1 py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-amber-500/20"
+          >
+            <Store size={24} />
+            <span className="text-lg">Mở Chợ</span>
+          </button>
+          
+          <button 
+            onClick={() => navigate('/join-market')}
+            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-400 hover:to-red-400 text-white flex-1 py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-orange-500/20"
+          >
+            <Users size={24} />
+            <span className="text-lg">Vào Chợ</span>
           </button>
         </div>
       </div>

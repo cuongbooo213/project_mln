@@ -1,0 +1,38 @@
+[
+  {
+    "id": "case_01",
+    "title": "Hội nghị thành lập Đảng",
+    "correctAnswer": "1930",
+    "clues": [
+      "Sự kiện diễn ra tại Cửu Long, Hương Cảng (Hong Kong).",
+      "Nguyễn Ái Quốc là người chủ trì sự kiện này.",
+      "Sự kiện hợp nhất 3 tổ chức cộng sản thành một đảng duy nhất.",
+      "Văn kiện được thông qua bao gồm Chánh cương vắn tắt, Sách lược vắn tắt."
+    ],
+    "explanation": "Hội nghị thành lập Đảng Cộng sản Việt Nam diễn ra từ ngày 6/1 đến 7/2/1930 tại Hong Kong, đánh dấu sự ra đời của Đảng Cộng sản Việt Nam."
+  },
+  {
+    "id": "case_02",
+    "title": "Chiến thắng Điện Biên Phủ",
+    "correctAnswer": "1954",
+    "clues": [
+      "Chiến dịch diễn ra trong 56 ngày đêm khoét núi, ngủ hầm, mưa dầm, cơm vắt.",
+      "Tướng giặc bị bắt sống tại hầm chỉ huy vào buổi chiều tà.",
+      "Sự kiện này kết thúc hoàn toàn ách thống trị của thực dân Pháp tại Việt Nam.",
+      "Nó được mệnh danh là chiến thắng 'Lừng lẫy năm châu, chấn động địa cầu'."
+    ],
+    "explanation": "Chiến thắng Điện Biên Phủ kết thúc thắng lợi vào ngày 7/5/1954, buộc Pháp phải ký Hiệp định Genève."
+  },
+  {
+    "id": "case_03",
+    "title": "Đại hội Đổi Mới",
+    "correctAnswer": "1986",
+    "clues": [
+      "Đây là Đại hội đại biểu toàn quốc lần thứ VI của Đảng.",
+      "Đại hội đề ra đường lối đổi mới toàn diện đất nước.",
+      "Chuyển đổi từ nền kinh tế bao cấp sang nền kinh tế thị trường định hướng XHCN.",
+      "Tổng Bí thư được bầu tại Đại hội này là đồng chí Nguyễn Văn Linh."
+    ],
+    "explanation": "Đại hội VI của Đảng (12/1986) đã đề ra đường lối Đổi mới, mở ra một bước ngoặt quan trọng trong lịch sử Việt Nam."
+  }
+]

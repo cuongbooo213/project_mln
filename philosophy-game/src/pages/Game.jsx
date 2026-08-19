@@ -3,13 +3,13 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ref, onValue } from 'firebase/database';
 import { database } from '../firebase/config';
 import { getServerTime } from '../firebase/timeSync';
-import { submitAnswer, nextQuestion } from '../services/gameService';
-import { useTimer } from '../hooks/useTimer';
-import QuestionCard from '../components/QuestionCard';
-import AnswerButton from '../components/AnswerButton';
+import { submitTeamAnswer, nextQuestion } from '../services/gameService';
 import Leaderboard from '../components/Leaderboard';
+import TeamChat from '../components/TeamChat';
+import SubmissionArea from '../components/SubmissionArea';
 import { useAudioContext } from '../contexts/AudioContext';
 import logo from '../assets/logo21.png';
+import { Search } from 'lucide-react';
 import bgMusicFile from '../../sound_effect/backgroundmusicbeginning/nhac_nen_to_chuc_tro_choi-www_tiengdong_com (1).mp3';
 
 const Game = () => {
@@ -19,19 +19,11 @@ const Game = () => {
   const { playerId } = location.state || {};
 
   const [gameState, setGameState] = useState(null);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
   const [waitingForNext, setWaitingForNext] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showResult, setShowResult] = useState(false);
-  const timePerQuestion = gameState?.timePerQuestion || 15;
-
-  const { seconds, start, reset, pause } = useTimer(timePerQuestion, () => {
-    // Timer expired
-    if (!hasSubmitted) {
-      handleAnswerSubmit(null);
-    }
-  });
+  const timePerQuestion = gameState?.timePerQuestion || 90; // 90 seconds for a puzzle
+  const [seconds, setSeconds] = useState(timePerQuestion);
 
   const { isMuted } = useAudioContext();
   const audioRef = useRef(null);
@@ -75,41 +67,41 @@ const Game = () => {
     return () => unsubscribe();
   }, [roomCode, playerId, navigate]);
 
-  // Handle new question
+  // Handle new question and timer sync
   useEffect(() => {
     if (gameState?.questions && gameState.currentQuestionIndex !== undefined) {
-      const startTime = gameState.questionStartTime;
-      const now = getServerTime();
-      
-      // Reset state for new question
-      setSelectedAnswer(null);
-      setHasSubmitted(false);
       setWaitingForNext(false);
       setShowLeaderboard(false);
       setShowResult(false);
-      
-      if (startTime > now) {
-        // Still in delay before question starts
-        const delay = startTime - now;
-        reset(timePerQuestion);
-        setTimeout(() => {
-          start();
-        }, delay);
-      } else {
-        // Question already started, calculate remaining time
-        const elapsed = Math.floor((now - startTime) / 1000);
-        const remaining = Math.max(0, timePerQuestion - elapsed);
-        reset(remaining);
-        start();
-      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState?.currentQuestionIndex]);
 
+  // Global Timer Sync Effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (gameState?.questions && gameState.currentQuestionIndex !== undefined) {
+        const startTime = gameState.questionStartTime;
+        const now = getServerTime();
+        
+        if (startTime > now) {
+          // Still in delay before question starts
+          setSeconds(timePerQuestion);
+        } else {
+          // Question already started, calculate remaining time directly from server time
+          const elapsed = Math.floor((now - startTime) / 1000);
+          const remaining = Math.max(0, timePerQuestion - elapsed);
+          setSeconds(remaining);
+        }
+      }
+    }, 500); // Check twice a second to prevent visual skipping
+    
+    return () => clearInterval(interval);
+  }, [gameState?.currentQuestionIndex, gameState?.questionStartTime, timePerQuestion]);
+
   const isDelay = gameState ? getServerTime() < gameState.questionStartTime : false;
-  const numPlayers = Object.keys(gameState?.players || {}).length;
+  const numTeams = Object.keys(gameState?.teams || {}).length;
   const numAnswers = Object.keys(gameState?.questionAnswers?.[gameState?.currentQuestionIndex] || {}).length;
-  const allAnswered = numPlayers > 0 && numAnswers >= numPlayers;
+  const allAnswered = numTeams > 0 && numAnswers >= numTeams;
   const timeExpired = seconds === 0 && !isDelay && gameState;
   const shouldReveal = allAnswered || timeExpired;
 
@@ -124,24 +116,28 @@ const Game = () => {
         if (gameState.players[playerId]?.isHost) {
           setTimeout(() => {
             nextQuestion(roomCode, gameState.currentQuestionIndex, gameState.questions.length);
-          }, 5000);
+          }, 8000);
         }
-      }, 3000);
+      }, 5000);
     }
   }, [shouldReveal, showResult, waitingForNext, isDelay, gameState, playerId, roomCode]);
 
-  const handleAnswerSubmit = async (answerKey) => {
-    if (hasSubmitted || waitingForNext || showResult) return;
+  const currentQuestion = gameState?.questions?.[gameState.currentQuestionIndex];
+  const myTeamId = gameState?.players?.[playerId]?.teamId;
+  const teamHasAnswered = gameState?.questionAnswers?.[gameState.currentQuestionIndex]?.[myTeamId];
+
+  const handleAnswerSubmit = async (answer) => {
+    if (teamHasAnswered || waitingForNext || showResult) return;
     
     const submitTime = getServerTime();
     
-    setSelectedAnswer(answerKey);
-    setHasSubmitted(true);
-    
-    const currentQuestion = gameState.questions[gameState.currentQuestionIndex];
     let score = 0;
     
-    if (answerKey === currentQuestion.correct) {
+    // Normalize string for comparison
+    const normalizedSubmit = answer.toString().trim().toLowerCase();
+    const normalizedCorrect = currentQuestion.correctAnswer.toString().trim().toLowerCase();
+
+    if (normalizedSubmit === normalizedCorrect) {
       const startTime = gameState.questionStartTime;
       const timeTakenMs = Math.max(0, submitTime - startTime);
       const totalTimeMs = timePerQuestion * 1000;
@@ -154,21 +150,19 @@ const Game = () => {
       }
     }
     
-    await submitAnswer(roomCode, playerId, score, gameState.currentQuestionIndex);
+    await submitTeamAnswer(roomCode, myTeamId, score, gameState.currentQuestionIndex);
   };
 
   if (!gameState || !gameState.questions) {
     return <div className="flex-1 flex items-center justify-center text-white">Đang tải...</div>;
   }
 
-  const currentQuestion = gameState.questions[gameState.currentQuestionIndex];
-
   if (isDelay && !waitingForNext) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-        <img src={logo} alt="Logo" className="w-32 h-32 mb-6 object-cover rounded-full shadow-[0_0_20px_rgba(99,102,241,0.5)] ring-4 ring-indigo-500/50 bg-white animate-pulse" />
-        <h2 className="text-4xl font-bold text-white mb-4">Chuẩn bị...</h2>
-        <div className="text-xl text-indigo-300">Câu hỏi {gameState.currentQuestionIndex + 1} chuẩn bị xuất hiện</div>
+        <Search size={64} className="text-indigo-500 mb-6 animate-pulse" />
+        <h2 className="text-4xl font-bold text-white mb-4">Chuẩn bị giải mã...</h2>
+        <div className="text-xl text-indigo-300">Vụ án số {gameState.currentQuestionIndex + 1}</div>
       </div>
     );
   }
@@ -176,57 +170,129 @@ const Game = () => {
   if (showLeaderboard) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-6">
-        <img src={logo} alt="Logo" className="w-24 h-24 mb-4 object-cover rounded-full shadow-lg ring-2 ring-indigo-500/30 bg-white" />
-        <h2 className="text-2xl text-white mb-6">Đang chuẩn bị câu tiếp theo...</h2>
-        <Leaderboard players={gameState.players} />
+        <h2 className="text-2xl text-white mb-6">Đang chuẩn bị vụ án tiếp theo...</h2>
+        <Leaderboard teams={gameState.teams} />
       </div>
     );
   }
 
-  return (
-    <div className="flex-1 flex flex-col p-4 md:p-8 w-full max-w-4xl mx-auto relative">
-      
-      {/* Background Watermark Logo */}
-      <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0 opacity-15">
-        <img src={logo} alt="Watermark" className="w-[600px] h-[600px] md:w-[1200px] md:h-[1200px] max-w-none object-cover rounded-full" />
-      </div>
+  if (playerId === gameState.hostId) {
+    return (
+      <div className="flex-1 flex flex-col p-6 w-full max-w-4xl mx-auto h-[calc(100vh-80px)] overflow-y-auto">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-white mb-2">Giao diện Quản trò</h2>
+          <p className="text-indigo-400">Đang diễn ra: Vụ án {gameState.currentQuestionIndex + 1}/{gameState.questions.length}</p>
+        </div>
 
-      <div className="flex items-center justify-between mb-8 relative z-10">
-        <div className="text-lg font-bold bg-slate-800 px-4 py-2 rounded-xl text-white">
-          Điểm: <span className="text-indigo-400">{gameState.players[playerId]?.score || 0}</span>
+        <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 mb-8 text-center relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-yellow-500"></div>
+          <h3 className="text-2xl font-bold text-white mb-4">{currentQuestion?.title}</h3>
+          <div className="inline-block bg-slate-900 border border-slate-700 px-6 py-3 rounded-lg">
+            <span className="text-sm text-slate-400 block mb-1">Đáp án đúng</span>
+            <span className="text-3xl font-bold text-green-400 tracking-widest uppercase">{currentQuestion?.correctAnswer}</span>
+          </div>
+          
+          <div className="mt-6 flex justify-center">
+            <div className="w-20 h-20 flex items-center justify-center bg-slate-900 rounded-full border-4 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.5)]">
+              <span className={`text-2xl font-bold ${seconds <= 10 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+                {seconds}s
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <h3 className="text-xl font-bold text-white mb-4">Trạng thái các đội</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {Object.entries(gameState.teams || {}).map(([tId, team]) => {
+            const hasAnswered = gameState.questionAnswers?.[gameState.currentQuestionIndex]?.[tId];
+            return (
+              <div key={tId} className={`p-4 rounded-xl border ${hasAnswered ? 'bg-green-900/30 border-green-500' : 'bg-slate-800 border-slate-700'}`}>
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="font-bold text-lg text-white">{team.name}</h4>
+                  <span className="text-yellow-400 font-bold">{team.score} pts</span>
+                </div>
+                <div className="text-sm">
+                  {hasAnswered ? (
+                    <span className="text-green-400 flex items-center gap-1">✓ Đã chốt đáp án</span>
+                  ) : (
+                    <span className="text-slate-400 animate-pulse">Đang giải mã...</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // Determine clue based on player index in team
+  const teamPlayers = Object.entries(gameState.players).filter(([id, p]) => p.teamId === myTeamId);
+  teamPlayers.sort((a, b) => a[0].localeCompare(b[0]));
+  const myIndexInTeam = teamPlayers.findIndex(([id]) => id === playerId);
+  const myClue = currentQuestion.clues[myIndexInTeam % currentQuestion.clues.length];
+  const myTeam = gameState.teams[myTeamId];
+  const me = gameState.players[playerId];
+
+  return (
+    <div className="flex-1 flex flex-col p-4 w-full max-w-6xl mx-auto h-[calc(100vh-80px)]">
+      
+      <div className="flex items-center justify-between mb-4 bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+        <div className="flex flex-col">
+          <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">{myTeam?.name}</span>
+          <span className="text-lg font-bold text-white">Điểm: <span className="text-yellow-400">{myTeam?.score || 0}</span></span>
         </div>
         
-        <div className="relative w-16 h-16 flex items-center justify-center bg-slate-800 rounded-full border-4 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-          <span className={`text-2xl font-bold ${seconds <= 5 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+        <div className="text-center">
+          <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">Vụ án {gameState.currentQuestionIndex + 1}/{gameState.questions.length}</span>
+          <h2 className="text-xl font-bold text-white truncate max-w-[200px] md:max-w-[400px]">{currentQuestion.title}</h2>
+        </div>
+        
+        <div className="relative w-14 h-14 flex items-center justify-center bg-slate-900 rounded-full border-2 border-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]">
+          <span className={`text-xl font-bold ${seconds <= 10 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
             {seconds}
           </span>
         </div>
-        
-        <div className="text-lg font-bold bg-slate-800 px-4 py-2 rounded-xl text-slate-300">
-          Câu {gameState.currentQuestionIndex + 1}/{gameState.questions.length}
+      </div>
+
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
+        {/* Cột trái: Manh mối cá nhân & Form trả lời */}
+        <div className="flex flex-col gap-4 overflow-y-auto">
+          <div className="bg-gradient-to-br from-indigo-900/50 to-slate-900/50 p-6 rounded-xl border border-indigo-500/30 shadow-lg">
+            <h3 className="text-indigo-300 text-sm uppercase font-bold tracking-widest mb-2 flex items-center gap-2">
+              <Search size={16} /> Manh Mối Của Bạn
+            </h3>
+            <p className="text-2xl font-medium text-white leading-relaxed">
+              "{myClue}"
+            </p>
+          </div>
+
+          <SubmissionArea 
+            disabled={teamHasAnswered || showResult || timeExpired}
+            hasSubmitted={teamHasAnswered}
+            onSubmit={handleAnswerSubmit}
+            showResult={showResult}
+            correctAnswer={currentQuestion.correctAnswer}
+          />
+          
+          {showResult && (
+            <div className="bg-slate-800 p-4 rounded-xl border border-slate-700 mt-2">
+              <h4 className="text-yellow-400 font-bold mb-2">Giải thích:</h4>
+              <p className="text-slate-300 text-sm">{currentQuestion.explanation}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Cột phải: Khung Chat */}
+        <div className="h-[400px] md:h-full">
+          <TeamChat 
+            roomCode={roomCode}
+            teamId={myTeamId}
+            playerId={playerId}
+            playerName={me?.name || 'Vô danh'}
+          />
         </div>
       </div>
-
-      <QuestionCard 
-        question={currentQuestion.question} 
-        index={gameState.currentQuestionIndex} 
-        total={gameState.questions.length} 
-      />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        {Object.entries(currentQuestion.answers).map(([key, text]) => (
-          <AnswerButton 
-            key={key}
-            label={key}
-            text={text}
-            selected={selectedAnswer === key}
-            correct={showResult ? key === currentQuestion.correct : undefined}
-            disabled={hasSubmitted || showResult}
-            onClick={() => handleAnswerSubmit(key)}
-          />
-        ))}
-      </div>
-
     </div>
   );
 };

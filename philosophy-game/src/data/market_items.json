@@ -1,0 +1,272 @@
+[
+  {
+    "roundId": "round_01",
+    "mission": {
+      "title": "Sự ra đời của Đảng Cộng sản Việt Nam",
+      "description": "Hãy ghép các dữ kiện đã mua để trả lời: Sự kiện gì? Diễn ra khi nào? Ở đâu? Ai chủ trì? Văn kiện nào được thông qua?",
+      "correctAnswer": "1930",
+      "acceptableAnswers": ["1930", "hội nghị thành lập đảng", "3/2/1930"],
+      "bonusPoints": 500
+    },
+    "items": [
+      {
+        "id": "r1_date",
+        "type": "date",
+        "label": "📅 Mốc thời gian",
+        "content": "Ngày 3 tháng 2 năm 1930 — Mốc thời gian quan trọng của sự kiện.",
+        "hint": "Một con số gắn liền với sự khởi đầu vĩ đại...",
+        "startPrice": 100,
+        "isFake": false
+      },
+      {
+        "id": "r1_person",
+        "type": "person",
+        "label": "👤 Nhân vật",
+        "content": "Nguyễn Ái Quốc — Người chủ trì hội nghị hợp nhất 3 tổ chức cộng sản.",
+        "hint": "Một nhân vật vĩ đại đóng vai trò then chốt...",
+        "startPrice": 150,
+        "isFake": false
+      },
+      {
+        "id": "r1_place",
+        "type": "place",
+        "label": "📍 Địa điểm",
+        "content": "Cửu Long, Hương Cảng (Hong Kong) — Nơi diễn ra hội nghị.",
+        "hint": "Sự kiện không diễn ra trên đất Việt...",
+        "startPrice": 120,
+        "isFake": false
+      },
+      {
+        "id": "r1_doc",
+        "type": "document",
+        "label": "📜 Văn kiện",
+        "content": "Chánh cương vắn tắt, Sách lược vắn tắt — Cương lĩnh chính trị đầu tiên của Đảng.",
+        "hint": "Nền tảng tư tưởng quan trọng được thông qua...",
+        "startPrice": 180,
+        "isFake": false
+      },
+      {
+        "id": "r1_clue1",
+        "type": "clue",
+        "label": "🔎 Manh mối A",
+        "content": "Sự kiện hợp nhất 3 tổ chức: An Nam CSĐ, Đông Dương CSĐ, Đông Dương CS Liên Đoàn thành một đảng duy nhất.",
+        "hint": "Liên quan đến sự thống nhất các lực lượng...",
+        "startPrice": 100,
+        "isFake": false
+      },
+      {
+        "id": "r1_clue2",
+        "type": "clue",
+        "label": "🔎 Manh mối B",
+        "content": "Sự kiện đánh dấu sự ra đời của chính đảng tiên phong của giai cấp công nhân Việt Nam.",
+        "hint": "Một bước ngoặt lịch sử quan trọng...",
+        "startPrice": 90,
+        "isFake": false
+      },
+      {
+        "id": "r1_rare",
+        "type": "rare",
+        "label": "💎 Thông tin đặc biệt",
+        "content": "⭐ Ngày 3/2 hàng năm được chọn làm Ngày kỷ niệm thành lập Đảng Cộng sản Việt Nam. Sử dụng đúng: +100 điểm bonus.",
+        "hint": "Thông tin hiếm, có thể mang lại phần thưởng lớn...",
+        "startPrice": 250,
+        "isFake": false
+      },
+      {
+        "id": "r1_fake1",
+        "type": "clue",
+        "label": "🔎 Manh mối C",
+        "content": "⚠️ HÀNG GIẢ: Sự kiện diễn ra tại Quảng Châu, Trung Quốc vào năm 1925.",
+        "hint": "Thông tin về địa điểm và thời gian...",
+        "startPrice": 80,
+        "isFake": true
+      },
+      {
+        "id": "r1_fake2",
+        "type": "person",
+        "label": "👤 Nhân vật liên quan",
+        "content": "⚠️ HÀNG GIẢ: Phan Bội Châu là người triệu tập hội nghị thành lập.",
+        "hint": "Một nhân vật lịch sử nổi tiếng...",
+        "startPrice": 120,
+        "isFake": true
+      }
+    ]
+  },
+  {
+    "roundId": "round_02",
+    "mission": {
+      "title": "Chiến thắng lịch sử Điện Biên Phủ",
+      "description": "Ghép các thông tin để xác định: Chiến dịch nào? Kéo dài bao lâu? Kết quả? Tướng giặc bị bắt là ai?",
+      "correctAnswer": "1954",
+      "acceptableAnswers": ["1954", "điện biên phủ", "7/5/1954"],
+      "bonusPoints": 500
+    },
+    "items": [
+      {
+        "id": "r2_date",
+        "type": "date",
+        "label": "📅 Mốc thời gian",
+        "content": "Ngày 7 tháng 5 năm 1954 — Ngày chiến thắng hoàn toàn.",
+        "hint": "Một ngày lừng lẫy trong lịch sử...",
+        "startPrice": 100,
+        "isFake": false
+      },
+      {
+        "id": "r2_person",
+        "type": "person",
+        "label": "👤 Nhân vật",
+        "content": "Đại tướng Võ Nguyên Giáp — Tổng tư lệnh chiến dịch, thiên tài quân sự.",
+        "hint": "Người chỉ huy tối cao phía Việt Nam...",
+        "startPrice": 150,
+        "isFake": false
+      },
+      {
+        "id": "r2_place",
+        "type": "place",
+        "label": "📍 Địa điểm",
+        "content": "Thung lũng Điện Biên Phủ, tỉnh Lai Châu (nay là Điện Biên).",
+        "hint": "Một thung lũng nằm ở vùng Tây Bắc...",
+        "startPrice": 120,
+        "isFake": false
+      },
+      {
+        "id": "r2_event",
+        "type": "clue",
+        "label": "⚔️ Sự kiện",
+        "content": "56 ngày đêm 'khoét núi, ngủ hầm, mưa dầm, cơm vắt' — Chiến dịch kéo dài từ 13/3 đến 7/5.",
+        "hint": "Một chiến dịch đầy gian khổ và hy sinh...",
+        "startPrice": 130,
+        "isFake": false
+      },
+      {
+        "id": "r2_person2",
+        "type": "person",
+        "label": "👤 Tướng giặc",
+        "content": "Tướng De Castries — Bị bắt sống tại hầm chỉ huy vào buổi chiều tà.",
+        "hint": "Chỉ huy tối cao của quân đội đối phương...",
+        "startPrice": 140,
+        "isFake": false
+      },
+      {
+        "id": "r2_doc",
+        "type": "document",
+        "label": "📜 Văn kiện",
+        "content": "Hiệp định Genève (1954) — Được ký kết sau chiến thắng, công nhận độc lập Việt Nam.",
+        "hint": "Một hiệp định quốc tế quan trọng...",
+        "startPrice": 160,
+        "isFake": false
+      },
+      {
+        "id": "r2_rare",
+        "type": "rare",
+        "label": "💎 Thông tin đặc biệt",
+        "content": "⭐ Chiến thắng được mệnh danh là 'Lừng lẫy năm châu, chấn động địa cầu'. Bonus +100 điểm.",
+        "hint": "Một danh hiệu vang dội toàn thế giới...",
+        "startPrice": 220,
+        "isFake": false
+      },
+      {
+        "id": "r2_fake1",
+        "type": "date",
+        "label": "📅 Mốc thời gian phụ",
+        "content": "⚠️ HÀNG GIẢ: Chiến dịch kết thúc vào ngày 30/4/1954.",
+        "hint": "Một mốc thời gian đáng nhớ...",
+        "startPrice": 70,
+        "isFake": true
+      },
+      {
+        "id": "r2_fake2",
+        "type": "clue",
+        "label": "🔎 Manh mối bổ sung",
+        "content": "⚠️ HÀNG GIẢ: Quân đội Mỹ trực tiếp tham chiến tại trận này.",
+        "hint": "Về lực lượng tham gia...",
+        "startPrice": 90,
+        "isFake": true
+      }
+    ]
+  },
+  {
+    "roundId": "round_03",
+    "mission": {
+      "title": "Đường lối Đổi Mới",
+      "description": "Xác định: Đại hội nào? Năm nào? Ai là Tổng Bí thư? Nội dung đổi mới chính là gì?",
+      "correctAnswer": "1986",
+      "acceptableAnswers": ["1986", "đại hội vi", "đại hội 6", "đổi mới"],
+      "bonusPoints": 500
+    },
+    "items": [
+      {
+        "id": "r3_date",
+        "type": "date",
+        "label": "📅 Mốc thời gian",
+        "content": "Tháng 12 năm 1986 — Thời điểm diễn ra Đại hội.",
+        "hint": "Cuối một thập niên đầy biến động...",
+        "startPrice": 100,
+        "isFake": false
+      },
+      {
+        "id": "r3_person",
+        "type": "person",
+        "label": "👤 Nhân vật",
+        "content": "Nguyễn Văn Linh — Được bầu làm Tổng Bí thư tại Đại hội này.",
+        "hint": "Người đứng đầu Đảng trong giai đoạn mới...",
+        "startPrice": 150,
+        "isFake": false
+      },
+      {
+        "id": "r3_event",
+        "type": "clue",
+        "label": "⚔️ Sự kiện",
+        "content": "Đại hội đại biểu toàn quốc lần thứ VI của Đảng — Đề ra đường lối đổi mới toàn diện.",
+        "hint": "Một đại hội mang tính bước ngoặt...",
+        "startPrice": 130,
+        "isFake": false
+      },
+      {
+        "id": "r3_doc",
+        "type": "document",
+        "label": "📜 Văn kiện",
+        "content": "Nghị quyết Đại hội VI: Chuyển đổi từ kinh tế bao cấp sang kinh tế thị trường định hướng XHCN.",
+        "hint": "Một quyết sách làm thay đổi vận mệnh đất nước...",
+        "startPrice": 170,
+        "isFake": false
+      },
+      {
+        "id": "r3_clue1",
+        "type": "clue",
+        "label": "🔎 Manh mối",
+        "content": "Trước Đại hội, đất nước lâm vào khủng hoảng kinh tế - xã hội trầm trọng, lạm phát phi mã.",
+        "hint": "Bối cảnh dẫn đến sự thay đổi...",
+        "startPrice": 90,
+        "isFake": false
+      },
+      {
+        "id": "r3_rare",
+        "type": "rare",
+        "label": "💎 Thông tin đặc biệt",
+        "content": "⭐ Đổi Mới được ví như 'Perestroika của Việt Nam'. Mở ra kỷ nguyên hội nhập quốc tế. Bonus +100 điểm.",
+        "hint": "Một so sánh mang tầm quốc tế...",
+        "startPrice": 200,
+        "isFake": false
+      },
+      {
+        "id": "r3_fake1",
+        "type": "person",
+        "label": "👤 Nhân vật liên quan",
+        "content": "⚠️ HÀNG GIẢ: Lê Duẩn là Tổng Bí thư được bầu tại Đại hội Đổi Mới.",
+        "hint": "Một nhân vật lãnh đạo cấp cao...",
+        "startPrice": 110,
+        "isFake": true
+      },
+      {
+        "id": "r3_fake2",
+        "type": "date",
+        "label": "📅 Thời gian bổ sung",
+        "content": "⚠️ HÀNG GIẢ: Đường lối Đổi Mới được đề ra vào năm 1975, ngay sau thống nhất.",
+        "hint": "Một mốc thời gian quan trọng...",
+        "startPrice": 80,
+        "isFake": true
+      }
+    ]
+  }
+]
