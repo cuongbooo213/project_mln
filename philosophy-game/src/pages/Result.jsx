@@ -12,7 +12,7 @@ import bgMusicFile from '../../sound_effect/backgroundmusicbeginning/we_are_the_
 const Result = () => {
   const { roomCode } = useParams();
   const navigate = useNavigate();
-  const [players, setPlayers] = useState({});
+  const [teams, setTeams] = useState({});
   const { isMuted } = useAudioContext();
   const audioRef = useRef(null);
 
@@ -21,7 +21,8 @@ const Result = () => {
       const roomRef = ref(database, `rooms/${roomCode}`);
       const snapshot = await get(roomRef);
       if (snapshot.exists()) {
-        setPlayers(snapshot.val().players || {});
+        const data = snapshot.val();
+        setTeams(data.teams || {});
       }
     };
     fetchResult();
@@ -89,33 +90,33 @@ const Result = () => {
   }, [isMuted]);
 
   // Find winner
-  const sortedPlayers = Object.values(players).sort((a, b) => b.score - a.score);
-  const winner = sortedPlayers.length > 0 ? sortedPlayers[0] : null;
+  const sortedTeams = Object.values(teams).sort((a, b) => b.score - a.score);
+  const winner = sortedTeams.length > 0 ? sortedTeams[0] : null;
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-2xl text-center flex flex-col items-center">
-        <img src={logo} alt="Philosophy Arena" className="w-24 h-24 mb-6 object-cover rounded-full shadow-[0_0_20px_rgba(99,102,241,0.3)] ring-2 ring-indigo-500/30 bg-white" />
-        <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-600 mb-2">
+        <img src={logo} alt="Mật Mã Lịch Sử" className="w-24 h-24 mb-6 object-cover rounded-full shadow-[0_0_20px_rgba(99,102,241,0.3)] ring-2 ring-indigo-500/30 bg-white" />
+        <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-yellow-500 mb-2">
           Kết Quả Chung Cuộc
         </h1>
-        <p className="text-slate-400 mb-10 text-lg">Phòng chơi: {roomCode}</p>
+        <p className="text-slate-400 mb-10 text-lg">Mật mã phòng: {roomCode}</p>
 
         {winner && (
           <div className="mb-12 animate-bounce">
-            <div className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Người Chiến Thắng</div>
-            <div className="text-4xl font-bold text-white bg-slate-800 border-2 border-yellow-500/50 px-8 py-4 rounded-3xl shadow-[0_0_30px_rgba(234,179,8,0.3)]">
+            <div className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Đội Chiến Thắng</div>
+            <div className="text-4xl font-bold text-white bg-slate-800 border-2 border-yellow-500/50 px-8 py-4 rounded-3xl shadow-[0_0_30px_rgba(234,179,8,0.3)] flex items-center justify-center gap-4">
               👑 {winner.name} 
-              <span className="text-2xl text-yellow-500 ml-4">{winner.score} pts</span>
+              <span className="text-2xl text-yellow-500">{winner.score} pts</span>
             </div>
           </div>
         )}
 
-        <Leaderboard players={players} />
+        <Leaderboard teams={teams} />
 
         <button 
           onClick={() => navigate('/')}
-          className="btn-secondary mt-12 w-full max-w-sm"
+          className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-6 rounded-xl mt-12 w-full max-w-sm flex items-center justify-center gap-2 transition-colors shadow-lg"
         >
           <Home size={20} />
           <span>Về Trang Chủ</span>
