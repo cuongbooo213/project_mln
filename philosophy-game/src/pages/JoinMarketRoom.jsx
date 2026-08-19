@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { joinMarketRoom } from '../services/marketService';
 import { ArrowLeft, Store, Users } from 'lucide-react';
+import logoMarket from '../assets/4c4d23f2-9d81-40c2-9a9b-5a87e030e1e3.jpg';
 
 const JoinMarketRoom = () => {
   const [name, setName] = useState('');
@@ -33,8 +34,8 @@ const JoinMarketRoom = () => {
       </button>
 
       <div className="panel w-full max-w-lg relative pt-16 mt-8">
-        <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-[0_0_30px_rgba(249,115,22,0.4)] ring-[6px] ring-slate-800">
-          <Users size={44} className="text-white" />
+        <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full shadow-[0_0_30px_rgba(249,115,22,0.4)] ring-[6px] ring-slate-800">
+          <img src={logoMarket} alt="Chợ Lịch Sử Logo" className="w-full h-full object-cover rounded-full" />
         </div>
 
         <h2 className="text-3xl font-bold mb-2 text-center text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-500">Vào Chợ</h2>

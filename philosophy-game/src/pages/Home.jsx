@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Play, Users, Brain, BookOpen, Store } from 'lucide-react';
 import logoSingle from '../assets/logo.jpg';
 import logoMulti from '../assets/logo21.png';
+import logoMarket from '../assets/4c4d23f2-9d81-40c2-9a9b-5a87e030e1e3.jpg';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ const Home = () => {
           </button>
           
           <button 
-            onClick={() => navigate('/join-room-old')}
+            onClick={() => navigate('/join-room')}
             className="btn-secondary flex-1 !py-4"
           >
             <Users size={24} />
@@ -100,9 +101,7 @@ const Home = () => {
       {/* Cột 4: Chợ Lịch Sử */}
       <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-12 bg-slate-900/20 hover:bg-slate-800/40 transition-all duration-500 group">
         <div className="mb-8 transform group-hover:scale-105 transition-transform duration-500">
-          <div className="w-48 h-48 md:w-56 md:h-56 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.3)] ring-4 ring-amber-500/30">
-            <Store size={96} className="text-white" />
-          </div>
+          <img src={logoMarket} alt="Chợ Lịch Sử Logo" className="w-48 h-48 md:w-56 md:h-56 object-cover rounded-full shadow-[0_0_30px_rgba(245,158,11,0.3)] ring-4 ring-amber-500/30" />
         </div>
         
         <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-4 text-center">

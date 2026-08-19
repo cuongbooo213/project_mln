@@ -22,7 +22,7 @@ function App() {
     <div className="flex flex-col min-h-screen bg-slate-900 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-800 via-slate-900 to-slate-950 font-sans text-slate-100">
       <header className="w-full py-4 px-6 border-b border-slate-800/50 backdrop-blur-md sticky top-0 z-10 flex justify-center relative">
         <div className="font-bold text-2xl tracking-tighter text-white flex items-center gap-2">
-          <span className="text-red-500">Mật Mã</span> Lịch Sử
+          <span className="text-red-500">Không Gian</span> Triết - Sử
         </div>
         <button 
           onClick={toggleMute} 
