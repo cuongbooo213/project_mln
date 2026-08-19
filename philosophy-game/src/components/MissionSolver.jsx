@@ -1,15 +1,7 @@
-import React, { useState } from 'react';
-import { CheckCircle2, Brain, Package } from 'lucide-react';
+import React from 'react';
+import { CheckCircle2, Brain, Package, Hand } from 'lucide-react';
 
-const MissionSolver = ({ mission, inventory = {}, onSubmit, hasSubmitted, showResult, seconds }) => {
-  const [answer, setAnswer] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!answer.trim() || hasSubmitted) return;
-    onSubmit(answer.trim());
-  };
-
+const MissionSolver = ({ mission, inventory = {}, onToggleHand, hasSubmitted, showResult, isLeader, revealedIndices = {}, isHandRaised, myAnswer }) => {
   const items = Object.entries(inventory);
 
   if (showResult) {
@@ -23,12 +15,27 @@ const MissionSolver = ({ mission, inventory = {}, onSubmit, hasSubmitted, showRe
     );
   }
 
-  if (hasSubmitted) {
+  if (myAnswer) {
     return (
-      <div className="bg-indigo-900/30 p-6 rounded-xl border border-indigo-500/50 text-center">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="w-12 h-12 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-amber-300 font-medium">Đã nộp đáp án! Đang chờ kết quả...</p>
+      <div className="flex flex-col gap-4">
+        {/* Mission info */}
+        <div className="bg-gradient-to-br from-red-900/30 to-slate-900/80 p-5 rounded-xl border border-red-500/30 shadow-lg">
+          <div className="flex items-center gap-2 mb-3">
+            <Brain size={20} className="text-red-400" />
+            <span className="text-xs text-red-400 uppercase font-bold tracking-widest">Nhiệm Vụ</span>
+          </div>
+          <h3 className="text-xl font-bold text-white mb-2">{mission?.title}</h3>
+          <p className="text-slate-300 text-sm leading-relaxed">{mission?.description}</p>
+        </div>
+
+        <div className={`p-6 rounded-xl border text-center ${myAnswer.isCorrect ? 'bg-green-900/30 border-green-500/30' : 'bg-red-900/30 border-red-500/30'}`}>
+          <div className="text-4xl mb-3">{myAnswer.isCorrect ? '✅' : '❌'}</div>
+          <div className={`text-xl font-bold mb-1 ${myAnswer.isCorrect ? 'text-green-400' : 'text-red-400'}`}>
+            {myAnswer.isCorrect ? 'Chính xác!' : 'Sai rồi!'}
+          </div>
+          <div className="text-slate-300 text-sm">
+            Đáp án của đội: "<span className="font-bold">{myAnswer.answer}</span>" — Điểm: <span className="text-amber-400 font-bold">+{myAnswer.score}</span>
+          </div>
         </div>
       </div>
     );
@@ -44,18 +51,27 @@ const MissionSolver = ({ mission, inventory = {}, onSubmit, hasSubmitted, showRe
         </div>
         <h3 className="text-xl font-bold text-white mb-2">{mission?.title}</h3>
         <p className="text-slate-300 text-sm leading-relaxed">{mission?.description}</p>
+      </div>
 
-        {/* Timer */}
-        <div className="mt-4 flex items-center justify-center">
-          <div className={`w-14 h-14 rounded-full flex items-center justify-center border-3 ${
-            seconds <= 10 ? 'border-red-500 bg-red-900/30' : 'border-amber-500 bg-slate-900'
-          }`}>
-            <span className={`text-xl font-bold ${seconds <= 10 ? 'text-red-400 animate-pulse' : 'text-white'}`}>
-              {seconds}s
-            </span>
+      {/* Render masked answer */}
+      {mission?.correctAnswer && (
+        <div className="bg-slate-900/80 p-4 rounded-lg border border-slate-700 text-center shadow-lg">
+          <div className="text-xs text-slate-400 mb-3 uppercase tracking-widest font-bold">Gợi ý đáp án ({mission.correctAnswer.length} ký tự)</div>
+          <div className="flex flex-wrap justify-center gap-2">
+            {mission.correctAnswer.split('').map((char, idx) => {
+              const isSpace = char === ' ';
+              const isRevealed = revealedIndices[idx];
+              return (
+                <div key={idx} className={`w-8 h-10 sm:w-10 sm:h-12 flex items-center justify-center text-xl font-bold rounded-lg ${
+                  isSpace ? 'bg-transparent' : 'bg-slate-800 border-2 border-slate-600 shadow-inner'
+                } ${isRevealed ? 'text-amber-400 border-amber-500/50' : 'text-slate-700'}`}>
+                  {isSpace ? ' ' : isRevealed ? char : '?'}
+                </div>
+              );
+            })}
           </div>
         </div>
-      </div>
+      )}
 
       {/* Quick inventory reference */}
       {items.length > 0 && (
@@ -73,18 +89,32 @@ const MissionSolver = ({ mission, inventory = {}, onSubmit, hasSubmitted, showRe
         </div>
       )}
 
-      {/* Answer form */}
+      {/* Raise hand to answer */}
       <div className="bg-slate-800 p-5 rounded-xl border border-slate-700">
-        <h3 className="text-lg font-bold mb-3 text-white text-center">Chốt Đáp Án</h3>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <input type="text" value={answer} onChange={(e) => setAnswer(e.target.value)}
-            placeholder="Nhập đáp án (VD: 1930 hoặc Hội nghị thành lập Đảng)..."
-            className="w-full bg-slate-900 border-2 border-slate-600 focus:border-amber-500 rounded-xl px-4 py-3 text-white text-center font-bold text-lg transition-colors" />
-          <button type="submit" disabled={!answer.trim()}
-            className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 disabled:from-slate-700 disabled:to-slate-700 disabled:text-slate-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
-            <CheckCircle2 /> GỬI ĐÁP ÁN
-          </button>
-        </form>
+        <h3 className="text-lg font-bold mb-3 text-white text-center">Trả Lời Câu Hỏi</h3>
+        {isLeader ? (
+          <div className="flex flex-col items-center gap-3">
+            <button
+              onClick={() => onToggleHand(!isHandRaised)}
+              className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 shadow-lg transition-all ${
+                isHandRaised
+                  ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white animate-pulse'
+                  : 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white'
+              }`}
+            >
+              <Hand size={24} /> {isHandRaised ? '✋ Đang Giơ Tay — Bấm Để Hạ' : '🙋 Giơ Tay Trả Lời'}
+            </button>
+            {isHandRaised && (
+              <p className="text-amber-300 text-sm text-center animate-pulse">Đang chờ Chủ Chợ mời trả lời...</p>
+            )}
+          </div>
+        ) : (
+          <div className="text-center py-6 px-4 bg-slate-900/50 rounded-xl border border-slate-700">
+            <span className="text-3xl opacity-50 block mb-2">🔒</span>
+            <div className="text-amber-400 font-bold mb-1 animate-pulse">👑 Đang chờ Trưởng Nhóm giơ tay...</div>
+            <div className="text-sm text-slate-400">Chỉ Trưởng Nhóm mới có quyền giơ tay trả lời. Hãy thảo luận ở kênh Chat nhé!</div>
+          </div>
+        )}
       </div>
     </div>
   );

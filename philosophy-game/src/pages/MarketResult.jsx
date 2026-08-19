@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ref, get } from 'firebase/database';
 import { database } from '../firebase/config';
-import { Trophy, Coins, Package, Star, AlertTriangle, Home } from 'lucide-react';
+import { CheckCircle2, Home, History } from 'lucide-react';
+import marketItemsData from '../data/market_items.json';
 
 const MarketResult = () => {
   const { roomCode } = useParams();
@@ -24,93 +25,61 @@ const MarketResult = () => {
   }
 
   const teams = roomData.teams || {};
-
-  // Calculate final scores
-  const rankings = Object.entries(teams).map(([tId, team]) => {
-    const xu = team.xu || 0;
-    const missionScore = team.score || 0;
-    const inventory = team.inventory || {};
-    const itemCount = Object.keys(inventory).length;
-    const fakeCount = Object.values(inventory).filter(i => i.isFake).length;
-    const rareCount = Object.values(inventory).filter(i => i.type === 'rare' && !i.isFake).length;
-
-    const totalScore = xu + missionScore;
-
-    return {
-      teamId: tId,
-      name: team.name,
-      emoji: team.emoji,
-      xu,
-      missionScore,
-      itemCount,
-      fakeCount,
-      rareCount,
-      totalScore,
-    };
-  }).sort((a, b) => b.totalScore - a.totalScore);
-
-  const winner = rankings[0];
-  const myTeamId = roomData.players?.[playerId]?.teamId;
+  const rounds = roomData.rounds || [];
 
   return (
     <div className="flex-1 flex flex-col items-center p-4 md:p-8 overflow-y-auto">
       <div className="w-full max-w-3xl">
-        {/* Winner */}
-        <div className="text-center mb-8 relative">
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-6xl animate-bounce">🏆</div>
-          <div className="pt-16 pb-6 bg-gradient-to-br from-amber-900/40 to-slate-900/80 rounded-2xl border border-amber-500/30 shadow-[0_0_40px_rgba(245,158,11,0.2)]">
-            <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-2">
-              {winner.emoji} {winner.name}
-            </h2>
-            <p className="text-xl text-amber-300 font-bold mb-1">🏆 Vô Địch Chợ Lịch Sử!</p>
-            <p className="text-4xl font-black text-white">{winner.totalScore} điểm</p>
-          </div>
+        <div className="text-center mb-8">
+          <div className="text-6xl mb-4">🏆</div>
+          <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-2">
+            Tổng Kết Trò Chơi
+          </h2>
+          <p className="text-xl text-amber-300 font-bold mb-1">Thống Kê Đáp Án Các Vòng</p>
         </div>
 
-        {/* Leaderboard */}
-        <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden mb-6">
-          <div className="bg-slate-800 p-4 border-b border-slate-700">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <Trophy size={20} className="text-amber-400" /> Bảng Xếp Hạng Chung Cuộc
-            </h3>
-          </div>
-          <div className="divide-y divide-slate-700">
-            {rankings.map((team, index) => {
-              const isMe = team.teamId === myTeamId;
-              const medals = ['🥇', '🥈', '🥉'];
-              return (
-                <div key={team.teamId}
-                  className={`p-4 flex items-center gap-4 ${isMe ? 'bg-amber-900/20' : ''} ${index < 3 ? 'bg-slate-800' : ''}`}>
-                  <div className="text-2xl w-10 text-center font-bold">
-                    {medals[index] || <span className="text-slate-500 text-lg">{index + 1}</span>}
-                  </div>
-                  <div className="text-2xl">{team.emoji}</div>
-                  <div className="flex-1">
-                    <div className="font-bold text-white flex items-center gap-2">
-                      {team.name}
-                      {isMe && <span className="text-xs bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded">Đội bạn</span>}
-                    </div>
-                    <div className="flex flex-wrap gap-3 text-xs text-slate-400 mt-1">
-                      <span className="flex items-center gap-1"><Coins size={12} className="text-amber-400" /> {team.xu} Xu còn</span>
-                      <span className="flex items-center gap-1"><Star size={12} className="text-green-400" /> {team.missionScore} Nhiệm vụ</span>
-                      <span className="flex items-center gap-1"><Package size={12} /> {team.itemCount} món</span>
-                      {team.fakeCount > 0 && (
-                        <span className="flex items-center gap-1 text-red-400"><AlertTriangle size={12} /> {team.fakeCount} hàng giả</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-black text-amber-400">{team.totalScore}</div>
-                    <div className="text-xs text-slate-500">điểm</div>
+        {/* Round by Round Stats */}
+        <div className="space-y-6 mb-8">
+          {marketItemsData.map((item, index) => {
+            const roundRecord = rounds[index] || {};
+            const answers = roundRecord.answers || {};
+            const correctTeams = Object.keys(answers);
+            
+            return (
+              <div key={item.roundId} className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg">
+                <div className="bg-slate-900/80 p-4 border-b border-slate-700">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <History size={20} className="text-amber-400" />
+                    Vòng {index + 1}: {item.mission.title}
+                  </h3>
+                  <div className="text-sm text-green-400 font-bold mt-2">
+                    Đáp án: {item.mission.correctAnswer}
                   </div>
                 </div>
-              );
-            })}
-          </div>
+                
+                <div className="p-4">
+                  {correctTeams.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                      {correctTeams.map(tId => (
+                        <div key={tId} className="flex items-center gap-2 bg-green-900/20 border border-green-500/30 px-3 py-2 rounded-lg text-green-300 text-sm font-bold">
+                          <CheckCircle2 size={16} className="text-green-500" />
+                          <span>{teams[tId]?.emoji} {teams[tId]?.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-slate-500 italic text-sm text-center py-2">
+                      Không có đội nào trả lời đúng ở vòng này.
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         <button onClick={() => navigate('/')}
-          className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg">
+          className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all">
           <Home size={20} /> Về Trang Chủ
         </button>
       </div>

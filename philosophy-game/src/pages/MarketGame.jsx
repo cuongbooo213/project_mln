@@ -5,16 +5,16 @@ import { database } from '../firebase/config';
 import { getServerTime } from '../firebase/timeSync';
 import {
   startMarketRound, startAuction, endAuction, cancelAuction,
-  placeBid, adjustTeamXu, sendBroadcast, sendHostHint,
+  toggleHand, adjustTeamXu, sendBroadcast, sendHostHint,
   startMissionPhase, submitMissionAnswer, finishMarketGame,
-  sendMarketChat,
+  sendMarketChat, revealMissionHint, toggleMissionHand
 } from '../services/marketService';
 import AuctionPanel from '../components/AuctionPanel';
 import TeamInventory from '../components/TeamInventory';
 import MissionSolver from '../components/MissionSolver';
 import { useAudioContext } from '../contexts/AudioContext';
 import marketItemsData from '../data/market_items.json';
-import { Store, Coins, Send, Megaphone, Gift, Pause, Play, SkipForward, Package, MessageCircle, Gavel, Brain } from 'lucide-react';
+import { Store, Coins, Send, Megaphone, Gift, Pause, Play, SkipForward, Package, MessageCircle, Gavel, Brain, Eye, EyeOff } from 'lucide-react';
 
 const MarketGame = () => {
   const { roomCode } = useParams();
@@ -26,7 +26,6 @@ const MarketGame = () => {
   const [messages, setMessages] = useState([]);
   const [broadcasts, setBroadcasts] = useState([]);
   const [activeTab, setActiveTab] = useState('auction'); // auction | inventory | chat
-  const [missionSeconds, setMissionSeconds] = useState(0);
   const messagesEndRef = useRef(null);
 
   // Host-specific states
@@ -35,6 +34,11 @@ const MarketGame = () => {
   const [hintText, setHintText] = useState('');
   const [xuTeam, setXuTeam] = useState('');
   const [xuAmount, setXuAmount] = useState(100);
+  const [winnerTeam, setWinnerTeam] = useState('');
+  const [finalPrice, setFinalPrice] = useState('');
+  const [showItemDetails, setShowItemDetails] = useState(false);
+  const [missionAnswerTeam, setMissionAnswerTeam] = useState('');
+  const [missionAnswerText, setMissionAnswerText] = useState('');
 
   const { isMuted } = useAudioContext();
 
@@ -87,20 +91,6 @@ const MarketGame = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Mission timer
-  useEffect(() => {
-    if (!roomData) return;
-    const round = roomData.currentRound;
-    const phase = roomData.rounds?.[round]?.phase;
-    if (phase !== 'mission' || !roomData.missionStartTime) return;
-
-    const missionDuration = roomData.config?.missionTimer || 120;
-    const interval = setInterval(() => {
-      const elapsed = Math.floor((getServerTime() - roomData.missionStartTime) / 1000);
-      setMissionSeconds(Math.max(0, missionDuration - elapsed));
-    }, 500);
-    return () => clearInterval(interval);
-  }, [roomData?.missionStartTime, roomData?.rounds, roomData?.currentRound, roomData?.config?.missionTimer]);
 
   if (!roomData) {
     return <div className="flex-1 flex items-center justify-center text-white">Đang tải...</div>;
@@ -112,6 +102,7 @@ const MarketGame = () => {
   const currentRound = roomData.currentRound ?? -1;
   const roundData = roomData.rounds?.[currentRound];
   const phase = roundData?.phase || 'shopping';
+  const revealedIndices = roundData?.revealedIndices || {};
   const auction = roomData.auction;
   const myTeam = teams[myTeamId];
 
@@ -121,6 +112,7 @@ const MarketGame = () => {
     const itemList = Object.entries(items);
 
     const handleStartRound = async () => {
+      if (!window.confirm("Bạn có chắc chắn muốn mở phiên chợ vòng này không?")) return;
       const nextRoundIdx = currentRound + 1;
       if (nextRoundIdx >= marketItemsData.length) {
         await finishMarketGame(roomCode);
@@ -141,19 +133,47 @@ const MarketGame = () => {
           itemId,
           itemLabel: item.label,
           itemHint: item.hint,
-          currentBid: item.startPrice,
-          currentBidder: null,
+          raisedHands: {},
           startTime: getServerTime(),
-          endTime: getServerTime() + (config.auctionTimer || 15) * 1000,
           bids: {},
         },
       });
+      setWinnerTeam('');
+      setFinalPrice(item.startPrice);
     };
 
-    const handleEndAuction = () => endAuction(roomCode);
-    const handleCancelAuction = () => cancelAuction(roomCode);
-    const handleMissionPhase = () => startMissionPhase(roomCode);
-    const handleFinish = () => finishMarketGame(roomCode);
+    const handleEndAuction = async (e) => {
+      e.preventDefault();
+      if (!winnerTeam || finalPrice === '') return;
+      
+      const priceNum = Number(finalPrice);
+      const teamXu = teams[winnerTeam]?.xu || 0;
+      
+      if (priceNum > teamXu) {
+        alert(`❌ Đội ${teams[winnerTeam]?.name} chỉ còn ${teamXu} Xu. Không thể chốt giá cao hơn số Xu đang có!`);
+        return;
+      }
+      
+      await endAuction(roomCode, winnerTeam, priceNum);
+    };
+    const handleCancelAuction = () => {
+      if (window.confirm("Bạn có chắc chắn muốn hủy phiên đấu giá hiện tại không?")) {
+        cancelAuction(roomCode);
+      }
+    };
+    const handleMissionPhase = () => {
+      if (window.confirm("Chốt hàng và chuyển sang phần giải nhiệm vụ? Các đội sẽ không thể mua thêm đồ nữa.")) {
+        startMissionPhase(roomCode);
+      }
+    };
+    const handleFinish = () => {
+      if (window.confirm("Bạn có chắc chắn muốn kết thúc game ngay bây giờ không?")) {
+        finishMarketGame(roomCode);
+      }
+    };
+    const handleRevealHint = async (idx) => {
+      await revealMissionHint(roomCode, idx);
+    };
 
     const handleBroadcast = async (e) => {
       e.preventDefault();
@@ -167,6 +187,21 @@ const MarketGame = () => {
       if (!hintText.trim() || !hintTeam) return;
       await sendHostHint(roomCode, hintTeam, hintText);
       setHintText('');
+    };
+
+    const handleHostCheckAnswer = async (e) => {
+      e.preventDefault();
+      if (!missionAnswerTeam || !missionAnswerText.trim()) return;
+      const result = await submitMissionAnswer(roomCode, missionAnswerTeam, missionAnswerText.trim());
+      // Hạ tay đội sau khi kiểm tra
+      await toggleMissionHand(roomCode, missionAnswerTeam, false);
+      if (result.isCorrect) {
+        alert(`✅ Đúng! Đội ${teams[missionAnswerTeam]?.name} được +${result.score} điểm!`);
+      } else {
+        alert(`❌ Sai! Đáp án "${missionAnswerText.trim()}" không chính xác.`);
+      }
+      setMissionAnswerText('');
+      setMissionAnswerTeam('');
     };
 
     const handleXuAdjust = async (teamId, amount) => {
@@ -213,10 +248,17 @@ const MarketGame = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
             {/* Items Panel */}
             <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
-              <h3 className="font-bold text-white mb-3 flex items-center gap-2">
-                <Package size={18} className="text-amber-400" />
-                Quầy Hàng ({itemList.filter(([,i]) => !i.soldTo).length} chưa bán / {itemList.length} tổng)
-              </h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-bold text-white flex items-center gap-2">
+                  <Package size={18} className="text-amber-400" />
+                  Quầy Hàng ({itemList.filter(([,i]) => !i.soldTo).length} chưa bán / {itemList.length} tổng)
+                </h3>
+                <button onClick={() => setShowItemDetails(!showItemDetails)}
+                  className="flex items-center gap-1 text-xs text-slate-400 hover:text-white transition-colors">
+                  {showItemDetails ? <EyeOff size={14} /> : <Eye size={14} />}
+                  {showItemDetails ? 'Ẩn chi tiết' : 'Hiện chi tiết'}
+                </button>
+              </div>
               <div className="space-y-2 max-h-[400px] overflow-y-auto">
                 {itemList.map(([itemId, item]) => (
                   <div key={itemId} className={`p-3 rounded-lg border flex items-center justify-between ${
@@ -225,9 +267,10 @@ const MarketGame = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-white">{item.label}</span>
-                        {item.isFake && <span className="text-[10px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded">GIẢ</span>}
                       </div>
-                      <div className="text-xs text-slate-400 mt-0.5">{item.startPrice} Xu — {item.content?.substring(0, 50)}...</div>
+                      <div className="text-xs text-slate-400 mt-0.5">
+                        <span className="text-amber-400 font-bold">{item.startPrice} Xu</span> — {showItemDetails ? item.content : item.hint}
+                      </div>
                       {item.soldTo && (
                         <div className="text-xs text-green-400 mt-0.5">✓ Bán cho {teams[item.soldTo]?.name} — {item.soldPrice} Xu</div>
                       )}
@@ -245,35 +288,75 @@ const MarketGame = () => {
 
             {/* Controls */}
             <div className="flex flex-col gap-3">
-              {/* Active auction controls */}
               {auction?.isActive && (
                 <div className="bg-amber-900/30 p-4 rounded-xl border border-amber-500/30">
-                  <h4 className="text-amber-400 font-bold mb-2">🔨 Đấu Giá Đang Diễn Ra</h4>
-                  <p className="text-white text-sm mb-1">{auction.itemLabel}</p>
-                  <p className="text-2xl font-black text-amber-400 mb-2">{auction.currentBid} Xu</p>
-                  {auction.currentBidder && (
-                    <p className="text-sm text-green-400 mb-3">Dẫn đầu: {teams[auction.currentBidder]?.emoji} {teams[auction.currentBidder]?.name}</p>
-                  )}
-                  <div className="flex gap-2">
-                    <button onClick={handleEndAuction} className="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg font-bold text-sm">🔨 Kết Thúc</button>
-                    <button onClick={handleCancelAuction} className="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 rounded-lg font-bold text-sm">❌ Hủy</button>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-amber-400 font-bold">🔨 Đang Bán: {auction.itemLabel}</h4>
+                    <button onClick={handleCancelAuction} className="bg-red-600/80 hover:bg-red-500 text-white px-3 py-1 rounded-lg font-bold text-xs">❌ Hủy</button>
                   </div>
+                  
+                  {/* Raised hands display */}
+                  <div className="mb-4">
+                    <div className="text-sm text-slate-300 mb-2">🙋 Các đội đang giơ tay:</div>
+                    <div className="flex flex-wrap gap-2">
+                      {!auction.raisedHands || Object.keys(auction.raisedHands).length === 0 ? (
+                        <span className="text-slate-500 text-sm italic">Chưa có ai giơ tay...</span>
+                      ) : (
+                        Object.keys(auction.raisedHands).map(tId => (
+                          <div key={tId} className="bg-amber-500/20 text-amber-300 px-3 py-1 rounded-lg border border-amber-500/30 flex items-center gap-2 text-sm font-bold animate-pulse">
+                            {teams[tId]?.emoji} {teams[tId]?.name}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Close deal form */}
+                  <form onSubmit={handleEndAuction} className="bg-slate-900/50 p-3 rounded-lg border border-slate-700 flex flex-col gap-2">
+                    <div className="text-sm font-bold text-white mb-1">Chốt Đơn</div>
+                    <div className="flex gap-2">
+                      <select value={winnerTeam} onChange={e => setWinnerTeam(e.target.value)} required
+                        className="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-2 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
+                        <option value="">Chọn đội thắng...</option>
+                        {Object.entries(teams).map(([tId, t]) => (
+                          <option key={tId} value={tId}>{t.emoji} {t.name} (Xu: {t.xu})</option>
+                        ))}
+                      </select>
+                      <input type="number" value={finalPrice} 
+                        onChange={e => {
+                          let val = e.target.value;
+                          if (winnerTeam && val !== '' && Number(val) > (teams[winnerTeam]?.xu || 0)) {
+                             val = teams[winnerTeam].xu;
+                          }
+                          setFinalPrice(val);
+                        }} 
+                        required placeholder="Giá (Xu)" 
+                        min={items[auction.itemId]?.startPrice || 0} 
+                        max={winnerTeam ? teams[winnerTeam]?.xu : ''}
+                        className="w-24 bg-slate-800 border border-slate-600 rounded-lg px-2 py-2 text-white text-sm focus:outline-none focus:border-amber-500" />
+                    </div>
+                    <button type="submit" disabled={!winnerTeam || finalPrice === ''}
+                      className="w-full bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg font-bold text-sm mt-1 disabled:opacity-50">
+                      🔨 Chốt Bán
+                    </button>
+                  </form>
                 </div>
               )}
 
               {/* Phase controls */}
               <div className="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
                 <h4 className="font-bold text-white mb-1">Điều Khiển</h4>
-                {phase === 'shopping' && (
+                {phase === 'shopping' ? (
                   <button onClick={handleMissionPhase}
-                    className="bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-lg font-bold flex items-center justify-center gap-2">
-                    <Brain size={18} /> Chuyển Sang Nhiệm Vụ
+                    className="bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 shadow-lg shadow-red-500/20">
+                    <Brain size={18} /> Chốt Hàng — Chuyển Sang Trả Lời Câu Hỏi
+                  </button>
+                ) : (
+                  <button onClick={handleStartRound} disabled={currentRound + 1 >= marketItemsData.length}
+                    className="bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-lg font-bold disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20">
+                    <SkipForward size={18} /> {currentRound + 1 >= marketItemsData.length ? 'Đã hết các vòng' : 'Chuyển Sang Vòng Tiếp Theo'}
                   </button>
                 )}
-                <button onClick={handleStartRound} disabled={currentRound + 1 >= marketItemsData.length}
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-lg font-bold disabled:opacity-50 flex items-center justify-center gap-2">
-                  <SkipForward size={18} /> {currentRound + 1 >= marketItemsData.length ? 'Hết vòng' : 'Vòng Tiếp Theo'}
-                </button>
                 <button onClick={handleFinish}
                   className="bg-slate-700 hover:bg-slate-600 text-white py-2.5 rounded-lg font-bold flex items-center justify-center gap-2">
                   🏁 Kết Thúc Game
@@ -309,9 +392,75 @@ const MarketGame = () => {
 
               {/* Mission answers overview */}
               {phase === 'mission' && (
-                <div className="bg-slate-800 p-3 rounded-xl border border-slate-700">
-                  <h4 className="font-bold text-white mb-2 text-sm">🧩 Đáp án các đội</h4>
-                  <div className="space-y-1">
+                <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                  <h4 className="font-bold text-white mb-4 text-sm flex items-center gap-2"><Brain size={18} className="text-amber-400" /> Nhiệm Vụ</h4>
+                  
+                  {/* Host masked hint view */}
+                  <div className="mb-5 p-4 bg-slate-900 rounded-lg text-center border border-slate-700">
+                    <div className="text-xs text-slate-400 mb-2 uppercase font-bold tracking-widest">Gợi ý hiện tại (Bấm vào ô để lật)</div>
+                    <div className="flex flex-wrap justify-center gap-1.5">
+                      {marketItemsData[currentRound]?.mission?.correctAnswer?.split('').map((char, idx) => {
+                        const isSpace = char === ' ';
+                        const isRevealed = revealedIndices[idx];
+                        return (
+                          <button key={idx} onClick={() => handleRevealHint(idx)} disabled={isSpace}
+                            className={`w-8 h-10 flex items-center justify-center text-lg font-bold rounded hover:ring-2 hover:ring-amber-500 transition-all ${
+                            isSpace ? 'bg-transparent cursor-default hover:ring-0' : 'bg-slate-800 border border-slate-600 cursor-pointer shadow-inner'
+                          } ${isRevealed ? 'text-amber-400' : 'text-slate-700'}`}>
+                            {isSpace ? ' ' : isRevealed ? char : '?'}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Mission raised hands */}
+                  <div className="mb-4">
+                    <div className="text-sm text-slate-300 mb-2">🙋 Các đội giơ tay trả lời:</div>
+                    <div className="flex flex-wrap gap-2">
+                      {!roundData?.missionHands || Object.keys(roundData.missionHands).length === 0 ? (
+                        <span className="text-slate-500 text-sm italic">Chưa có đội nào giơ tay...</span>
+                      ) : (
+                        Object.keys(roundData.missionHands)
+                          .sort((a, b) => (roundData.missionHands[a] || 0) - (roundData.missionHands[b] || 0))
+                          .map(tId => (
+                          <div key={tId} className={`px-3 py-1.5 rounded-lg border flex items-center gap-2 text-sm font-bold cursor-pointer ${
+                            roundData?.answers?.[tId]?.isCorrect
+                              ? 'bg-green-500/20 text-green-300 border-green-500/30'
+                              : 'bg-amber-500/20 text-amber-300 border-amber-500/30 animate-pulse'
+                          }`} onClick={() => { if (!roundData?.answers?.[tId]?.isCorrect) setMissionAnswerTeam(tId); }}>
+                            {teams[tId]?.emoji} {teams[tId]?.name}
+                            {roundData?.answers?.[tId]?.isCorrect && ' ✅'}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Host answer check form */}
+                  <form onSubmit={handleHostCheckAnswer} className="bg-slate-900/50 p-3 rounded-lg border border-slate-700 flex flex-col gap-2">
+                    <div className="text-sm font-bold text-white mb-1">📝 Nhập đáp án của đội để kiểm tra</div>
+                    <div className="flex gap-2">
+                      <select value={missionAnswerTeam} onChange={e => setMissionAnswerTeam(e.target.value)} required
+                        className="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-2 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
+                        <option value="">Chọn đội...</option>
+                        {Object.entries(teams).filter(([tId]) => !roundData?.answers?.[tId]?.isCorrect).map(([tId, t]) => (
+                          <option key={tId} value={tId}>{t.emoji} {t.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <input type="text" value={missionAnswerText} onChange={e => setMissionAnswerText(e.target.value)}
+                      placeholder="Nhập đáp án đội trả lời..." required
+                      className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500" />
+                    <button type="submit" disabled={!missionAnswerTeam || !missionAnswerText.trim()}
+                      className="w-full bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg font-bold text-sm disabled:opacity-50">
+                      ✅ Kiểm Tra Đáp Án
+                    </button>
+                  </form>
+
+                  {/* Already answered teams */}
+                  <div className="mt-4 space-y-1">
+                    <div className="text-xs text-slate-400 font-bold mb-1">Kết quả:</div>
                     {Object.entries(teams).map(([tId, team]) => {
                       const ans = roundData?.answers?.[tId];
                       return (
@@ -322,7 +471,7 @@ const MarketGame = () => {
                               {ans.isCorrect ? '✅' : '❌'} "{ans.answer}" (+{ans.score})
                             </span>
                           ) : (
-                            <span className="text-slate-500 animate-pulse">Đang làm...</span>
+                            <span className="text-slate-500">Chưa trả lời</span>
                           )}
                         </div>
                       );
@@ -342,14 +491,16 @@ const MarketGame = () => {
   const myXu = myTeam?.xu || 0;
   const roundMission = roundData?.mission;
   const myAnswer = roundData?.answers?.[myTeamId];
+  const hasCorrectAnswer = myAnswer?.isCorrect;
+  const isLeader = myTeam?.leaderId === playerId;
 
-  const handleBid = async (amount) => {
-    const result = await placeBid(roomCode, myTeamId, amount);
+  const handleToggleHand = async (isRaising) => {
+    const result = await toggleHand(roomCode, myTeamId, isRaising);
     if (!result.success) alert(result.error);
   };
 
-  const handleMissionSubmit = async (answer) => {
-    await submitMissionAnswer(roomCode, myTeamId, answer);
+  const handleMissionHandToggle = async (isRaising) => {
+    await toggleMissionHand(roomCode, myTeamId, isRaising);
   };
 
   const handleChat = async (e) => {
@@ -378,18 +529,22 @@ const MarketGame = () => {
           <MissionSolver
             mission={roundMission}
             inventory={myInventory}
-            onSubmit={handleMissionSubmit}
-            hasSubmitted={!!myAnswer}
+            onToggleHand={handleMissionHandToggle}
+            hasSubmitted={!!hasCorrectAnswer}
             showResult={false}
-            seconds={missionSeconds}
+            isLeader={isLeader}
+            revealedIndices={revealedIndices}
+            isHandRaised={!!roundData?.missionHands?.[myTeamId]}
+            myAnswer={hasCorrectAnswer ? myAnswer : null}
           />
         ) : (
           <AuctionPanel
             auction={auction}
             teams={teams}
             myTeamId={myTeamId}
-            onBid={handleBid}
+            onToggleHand={handleToggleHand}
             myXu={myXu}
+            isLeader={isLeader}
           />
         );
       case 'inventory':
@@ -472,10 +627,14 @@ const MarketGame = () => {
       <div className="hidden md:flex flex-1 min-h-0">
         <div className="flex-1 p-3 overflow-y-auto">
           {phase === 'mission' ? (
-            <MissionSolver mission={roundMission} inventory={myInventory} onSubmit={handleMissionSubmit}
-              hasSubmitted={!!myAnswer} showResult={false} seconds={missionSeconds} />
+            <MissionSolver mission={roundMission} inventory={myInventory}
+              onToggleHand={handleMissionHandToggle}
+              hasSubmitted={!!hasCorrectAnswer} showResult={false} isLeader={isLeader}
+              revealedIndices={revealedIndices}
+              isHandRaised={!!roundData?.missionHands?.[myTeamId]}
+              myAnswer={hasCorrectAnswer ? myAnswer : null} />
           ) : (
-            <AuctionPanel auction={auction} teams={teams} myTeamId={myTeamId} onBid={handleBid} myXu={myXu} />
+            <AuctionPanel auction={auction} teams={teams} myTeamId={myTeamId} onToggleHand={handleToggleHand} myXu={myXu} isLeader={isLeader} />
           )}
         </div>
         <div className="w-72 border-l border-slate-700 p-3 overflow-y-auto">

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ref, onValue, remove } from 'firebase/database';
 import { database } from '../firebase/config';
-import { joinMarketTeam } from '../services/marketService';
+import { joinMarketTeam, setTeamLeader } from '../services/marketService';
 import RoomCode from '../components/RoomCode';
 import { useAudioContext } from '../contexts/AudioContext';
 import { Users, Store, Play, Info, LogOut } from 'lucide-react';
@@ -47,6 +47,17 @@ const MarketLobby = () => {
     await joinMarketTeam(roomCode, playerId, teamId);
   };
 
+  const handleSetLeader = async (teamId, targetPlayerId) => {
+    const amITeamLeader = teams[teamId]?.leaderId === playerId;
+    if (!isHost && !amITeamLeader) return;
+    await setTeamLeader(roomCode, teamId, targetPlayerId);
+  };
+
+  const handleClaimLeader = async (teamId) => {
+    if (!playerId || isHost) return;
+    await setTeamLeader(roomCode, teamId, playerId);
+  };
+
   const handleStart = async () => {
     setIsStarting(true);
     // We just update gameState; the MarketGame page will handle round loading
@@ -86,7 +97,6 @@ const MarketLobby = () => {
           <RoomCode code={roomCode} />
           <div className="mt-4 flex gap-4 text-sm text-slate-400">
             <span>💰 {config.startingXu || 1000} Xu</span>
-            <span>⏱️ {config.auctionTimer || 15}s/đấu giá</span>
             <span>👥 {totalPlayers}/{maxPlayers}</span>
           </div>
         </div>
@@ -119,10 +129,20 @@ const MarketLobby = () => {
                     {teamPlayerIds.map(pid => {
                       const p = players[pid];
                       if (!p) return null;
+                      const isLeader = team.leaderId === pid;
+                      const amITeamLeader = amIHere && team.leaderId === playerId;
                       return (
                         <div key={pid} className="flex items-center gap-1.5 text-xs text-slate-300">
                           <span className="w-4 h-4 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-300 text-[10px] font-bold uppercase">{p.name?.charAt(0)}</span>
-                          {p.name} {pid === playerId && <span className="text-slate-500">(Bạn)</span>}
+                          <span className="truncate">
+                            {p.name} {pid === playerId && <span className="text-slate-500">(Bạn)</span>}
+                            {isLeader && <span className="ml-1" title="Trưởng nhóm">👑</span>}
+                          </span>
+                          {(isHost || amITeamLeader) && !isLeader && (
+                            <button onClick={() => handleSetLeader(teamId, pid)} className="ml-auto text-[10px] bg-slate-700 hover:bg-amber-600 text-slate-300 hover:text-white px-2 py-0.5 rounded transition-colors font-medium border border-slate-600 hover:border-amber-500">
+                              {isHost ? 'Phong 👑' : 'Nhường 👑'}
+                            </button>
+                          )}
                         </div>
                       );
                     })}
@@ -138,8 +158,15 @@ const MarketLobby = () => {
                     </button>
                   )}
                   {amIHere && (
-                    <div className="py-1.5 px-3 rounded-lg text-sm font-medium text-center bg-green-500/20 text-green-400 border border-green-500/30">
-                      Đội của bạn
+                    <div className="flex gap-2">
+                      <div className="flex-1 py-1.5 px-3 rounded-lg text-sm font-medium text-center bg-green-500/20 text-green-400 border border-green-500/30">
+                        Đội của bạn
+                      </div>
+                      {!team.leaderId && (
+                        <button onClick={() => handleClaimLeader(teamId)} className="py-1.5 px-3 rounded-lg text-sm font-medium text-center bg-amber-600 hover:bg-amber-500 text-white shadow-md">
+                          Nhận 👑
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -187,7 +214,7 @@ const MarketLobby = () => {
           <div className="text-slate-300 space-y-2 bg-slate-900/50 p-4 rounded-xl border border-slate-700/50 text-sm leading-relaxed">
             <p>💰 <strong className="text-amber-400">Mỗi đội nhận {config.startingXu || 1000} Xu</strong> để mua thông tin trong Chợ.</p>
             <p>🏪 <strong className="text-orange-400">Chủ Chợ đưa hàng ra bán</strong> — Các đội đấu giá hoặc mua trực tiếp.</p>
-            <p>📜 <strong className="text-blue-400">Hàng hóa gồm:</strong> Mốc thời gian, Nhân vật, Địa điểm, Văn kiện, Manh mối... và cả <strong className="text-red-400">HÀNG GIẢ!</strong></p>
+            <p>📜 <strong className="text-blue-400">Hàng hóa gồm:</strong> Mốc thời gian, Nhân vật, Địa điểm, Văn kiện, Manh mối...</p>
             <p>🧩 <strong className="text-green-400">Cuối mỗi vòng:</strong> Ghép thông tin đã mua để giải nhiệm vụ lịch sử.</p>
             <p>🏆 <strong className="text-yellow-400">Điểm cuối = Xu còn + Điểm nhiệm vụ + Bonus</strong></p>
           </div>
